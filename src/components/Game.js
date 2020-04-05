@@ -1,0 +1,229 @@
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
+
+const StyledApp = styled.div`
+	background: #fbf6ef;
+	display: flex;
+`
+
+const StyledSidebar = styled.aside`
+	background: #f9ea99;
+	border-right: 1px solid #e6b242;
+	color: #e6b242;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	flex: 0 0 276px;
+	margin: 0;
+	overflow-y: scroll;
+
+	.logo {	
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+	}
+
+	img {
+		margin-right: 15px;
+		width: 34px;
+	}
+
+	h1 {
+		display: inline-block;
+		margin: 0;
+	}
+`
+
+const StyledGameArea = styled.main`
+	display: flex;
+	height: 100vh;
+	padding: 40px;
+	overflow: scroll;
+
+	.button_area {
+		position: fixed;
+		top: 25px;
+		right: 15px;
+	}
+
+	button {
+		background: orange;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		font-size: 16px;
+		justify-content: center;
+		height: 40px;
+		width: 120px;
+	}
+`
+
+const StyledBoard = styled.ul`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    list-style-type: none;
+
+    li {
+        border: 1px dotted lightgrey;
+        border-radius: 8px;
+        cursor: grab;
+        font-size: 30px;
+        font-weight: bold;
+        height: 70px;
+        width: 70px;
+        margin: 2px;
+    }
+
+    span {
+        background: white;
+        border: 1px solid #e6b242;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+` 
+const StyledGameBoard = styled(StyledBoard)`
+	justify-content: left;
+	min-width: 1940px;
+
+	li {
+        height: 90px;
+        width: 90px;
+	}
+
+	span {
+        border: 1px solid black;
+	}
+`
+
+const pieces = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+class Game extends Component {
+    constructor(props) {
+        super(props)
+        
+        let [ gameStack, personalStack ] = this.getGameAndPersonalStack()
+        
+        this.state = {
+            gameStack,
+            personalStack,
+            solved: [...Array(360)]
+        }
+    }
+    componentDidMount() {
+        // use the center tile to center the dropzone area
+		let centerTile = document.querySelector('.center_tile');
+		
+		if(centerTile) {
+			centerTile.scrollIntoView({
+				block: 'center',
+			});
+		}
+	}
+	getGameAndPersonalStack() {
+		let gameStack = []
+
+        for(let i = 0; i < 144; i++) {
+			let randomIndex = Math.floor(Math.random() * 25) + 1
+			gameStack.push({
+				tile: pieces[randomIndex],
+				order: i,
+				board: 'personalStack'
+			})
+		}
+
+		let shuffledGameStack = this.shufflestack(gameStack)
+		let personalStack = shuffledGameStack.slice(4, 19)
+
+		return [ shuffledGameStack, personalStack ]
+	}
+    renderPieceContainer(piece, index, boardName) {
+        return (
+            <li
+				className={ index === 194 ? 'center_tile' : '' }
+                key={index}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => this.handleDrop(e, index, boardName)}>
+                {
+                    piece && <span
+                        draggable
+                        onDragStart={(e) => this.handleDragStart(e, piece.order)}>{piece.tile}</span>
+                }
+            </li>
+        );
+    }
+    shufflestack(gameStack) {
+        const shuffledStack = [...gameStack];
+
+        for (let i = shuffledStack.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1))
+            let tmp = shuffledStack[i]
+            shuffledStack[i] = shuffledStack[j]
+            shuffledStack[j] = tmp
+        }
+
+        return shuffledStack
+    }
+    handleDrop(e, index, targetName) {
+        let target = this.state[targetName];
+        if (target[index]) return;
+
+        const pieceOrder = e.dataTransfer.getData('text');
+		const pieceData = this.state.gameStack.find(p => p.order === +pieceOrder);
+        const origin = this.state[pieceData.board];
+
+        if (targetName === pieceData.board) target = origin;
+        origin[origin.indexOf(pieceData)] = undefined;
+        target[index] = pieceData;
+        pieceData.board = targetName;
+
+        this.setState({ [pieceData.board]: origin, [targetName]: target })
+    }
+    handleDragStart(e, order) {
+        const dt = e.dataTransfer;
+        dt.setData('text/plain', order);
+        dt.effectAllowed = 'move';
+	}
+    render() {
+        return (
+            <StyledApp>
+				<StyledSidebar>
+					<div className="logo">
+						<img alt='logo' src='https://image.flaticon.com/icons/svg/575/575393.svg' />
+						<h1>Bananagrams</h1>
+					</div>
+					<StyledBoard>
+						{ this.state.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
+					</StyledBoard>
+					<div>
+						Game stack: { this.state.gameStack.length } tiles
+					</div>
+				</StyledSidebar>
+				<StyledGameArea>
+					<StyledGameBoard>
+						{this.state.solved.map((piece, i) => this.renderPieceContainer(piece, i, 'solved'))}
+					</StyledGameBoard>
+
+					<div className="button_area">
+						<button>Split</button>
+					</div>
+				</StyledGameArea>
+            </StyledApp>
+        )
+    }
+}
+
+const mapStateToProps = (state, ownProps) => ({
+})
+
+export default connect(
+	mapStateToProps,
+	// mapDispatchToProps
+)(Game)
