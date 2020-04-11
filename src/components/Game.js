@@ -108,20 +108,13 @@ const pieces = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 
 class Game extends Component {
     constructor(props) {
-        super(props)
-		// let [ gameStack, personalStack ] = this.getGameAndPersonalStack()
-        
+		super(props)
+		
 		this.state = {
 			personalStack: this.getShuffledPieces(this.props.numOfPersonalTiles),
 			gameStack: this.getShuffledPieces(this.props.numOfGameTiles),
 			solved: [...Array(360)]
 		}
-		
-        // this.state = {
-        //     gameStack,
-        //     personalStack,
-        //     solved: [...Array(360)]
-        // }
     }
     componentDidMount() {
         // use the center tile to center the dropzone area
@@ -147,23 +140,6 @@ class Game extends Component {
 
 		return shuffledPieces
 	}
-	getGameAndPersonalStack() {
-		let gameStack = []
-
-        for(let i = 0; i < 144; i++) {
-			let randomIndex = Math.floor(Math.random() * 25) + 1
-			gameStack.push({
-				tile: pieces[randomIndex],
-				order: i,
-				board: 'personalStack'
-			})
-		}
-
-		let shuffledGameStack = this.shufflestack(gameStack)
-		let personalStack = shuffledGameStack.slice(4, 19)
-
-		return [ shuffledGameStack, personalStack ]
-	}
     renderPieceContainer(piece, index, boardName) {
         return (
             <li
@@ -181,18 +157,6 @@ class Game extends Component {
                 }
             </li>
         );
-    }
-    shufflestack(gameStack) {
-        const shuffledStack = [...gameStack];
-
-        for (let i = shuffledStack.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1))
-            let tmp = shuffledStack[i]
-            shuffledStack[i] = shuffledStack[j]
-            shuffledStack[j] = tmp
-        }
-
-        return shuffledStack
     }
     handleDrop(e, index, targetName) {
 		// if you're dropping at the spot where a tile is already there, 
