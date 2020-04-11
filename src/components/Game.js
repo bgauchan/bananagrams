@@ -35,6 +35,29 @@ const StyledSidebar = styled.aside`
 		display: inline-block;
 		margin: 0;
 	}
+
+	.dump_zone {
+		border-top: 1px solid #efc876;
+		border-bottom: 1px solid #efc876;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: 35px;
+		padding: 30px 30px 30px 35px;
+
+		li {
+			border: 2px dotted white;
+			height: 70px;
+			width: 70px;
+		}
+
+		span {
+			color: white;
+			font-size: 20px;
+			font-weight: bold;
+			max-width: 120px;
+		}
+	}
 `
 
 const StyledGameArea = styled.main`
@@ -188,6 +211,12 @@ class Game extends Component {
 					<StyledBoard>
 						{ this.state.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
 					</StyledBoard>
+					<div className="dump_zone">
+						<span>Dump a Tile here to trade it for 3 tiles</span>
+						<StyledBoard>
+							{ this.renderPieceContainer(undefined, 0, 'dump') }
+						</StyledBoard>
+					</div>
 				</StyledSidebar>
 				<StyledGameArea>
 					<StyledGameBoard>
