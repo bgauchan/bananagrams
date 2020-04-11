@@ -49,7 +49,7 @@ class StartScreen extends Component {
                     <span>M</span>
                 </div>
                 <button onClick={() => this.props.handleStartGame()}>
-                    Start
+                    SPLIT
                 </button>
             </StyledSection>
           );

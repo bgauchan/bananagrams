@@ -8,7 +8,7 @@ const StyledApp = styled.div`
 `
 
 const StyledSidebar = styled.aside`
-	background: #f9ea99;
+	background: #f9db5c;
 	border-right: 1px solid #e6b242;
 	color: #e6b242;
 	display: flex;
@@ -68,7 +68,7 @@ const StyledBoard = styled.ul`
     list-style-type: none;
 
     li {
-        border: 1px dotted lightgrey;
+        border: 1px dotted #e6b242;
         border-radius: 8px;
         cursor: grab;
         font-size: 30px;
@@ -94,12 +94,13 @@ const StyledGameBoard = styled(StyledBoard)`
 	min-width: 1940px;
 
 	li {
-        height: 90px;
-        width: 90px;
+        border: 1px dotted lightgrey;
+        height: 80px;
+        width: 80px;
 	}
 
-	span {
-        border: 1px solid black;
+	span {;
+		color: #e6b242;
 	}
 `
 
@@ -108,14 +109,19 @@ const pieces = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 class Game extends Component {
     constructor(props) {
         super(props)
+		// let [ gameStack, personalStack ] = this.getGameAndPersonalStack()
         
-        let [ gameStack, personalStack ] = this.getGameAndPersonalStack()
-        
-        this.state = {
-            gameStack,
-            personalStack,
-            solved: [...Array(360)]
-        }
+		this.state = {
+			personalStack: this.getShuffledPieces(this.props.numOfPersonalTiles),
+			gameStack: this.getShuffledPieces(this.props.numOfGameTiles),
+			solved: [...Array(360)]
+		}
+		
+        // this.state = {
+        //     gameStack,
+        //     personalStack,
+        //     solved: [...Array(360)]
+        // }
     }
     componentDidMount() {
         // use the center tile to center the dropzone area
@@ -126,6 +132,20 @@ class Game extends Component {
 				block: 'center',
 			});
 		}
+	}
+	getShuffledPieces(count) {
+		let shuffledPieces = []
+
+        for(let i = 0; i < count; i++) {
+			let randomIndex = Math.floor(Math.random() * 25) + 1
+			shuffledPieces.push({
+				tile: pieces[randomIndex],
+				order: i,
+				board: 'personalStack'
+			})
+		}
+
+		return shuffledPieces
 	}
 	getGameAndPersonalStack() {
 		let gameStack = []
@@ -152,9 +172,12 @@ class Game extends Component {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => this.handleDrop(e, index, boardName)}>
                 {
-                    piece && <span
+                    piece && 
+					<span
                         draggable
-                        onDragStart={(e) => this.handleDragStart(e, piece.order)}>{piece.tile}</span>
+                        onDragStart={(e) => this.handleDragStart(e, piece.order, piece.board)}>
+							{ piece.tile }
+					</span>
                 }
             </li>
         );
@@ -172,24 +195,39 @@ class Game extends Component {
         return shuffledStack
     }
     handleDrop(e, index, targetName) {
-        let target = this.state[targetName];
-        if (target[index]) return;
+		// if you're dropping at the spot where a tile is already there, 
+		// do nothing
+        let targetStack = this.state[targetName];
+        if (targetStack[index]) return;
 
-        const pieceOrder = e.dataTransfer.getData('text');
-		const pieceData = this.state.gameStack.find(p => p.order === +pieceOrder);
-        const origin = this.state[pieceData.board];
+		// get the order of the tile dropped and the original board it was in
+		// (comes in as 'order_board' format)
+		const originOrderAndStack = e.dataTransfer.getData('text').split('_')
+		let originOrder = originOrderAndStack[0]
+		let originStackName = originOrderAndStack[1]
+		let originTile = this.state[originStackName].find(p => p && (p.order === +originOrder))
 
-        if (targetName === pieceData.board) target = origin;
-        origin[origin.indexOf(pieceData)] = undefined;
-        target[index] = pieceData;
-        pieceData.board = targetName;
-
-        this.setState({ [pieceData.board]: origin, [targetName]: target })
+		// since we dragged it out, remove it from the original stack
+		let originStack = this.state[originStackName]
+		originStack[originOrder] = undefined	
+	
+		// add it to new stack with update info like the new order in target stack
+		// and the board as well
+		targetStack[index] = {
+			...originTile,
+			order: index,
+			board: targetName
+		}
+	
+		this.setState({ 
+			[originStackName]: originStack,
+			[targetName]: targetStack
+		})
     }
-    handleDragStart(e, order) {
-        const dt = e.dataTransfer;
-        dt.setData('text/plain', order);
-        dt.effectAllowed = 'move';
+    handleDragStart(e, order, board) {
+        const dt = e.dataTransfer
+        dt.setData('text/plain', (order + '_' + board))
+        dt.effectAllowed = 'move'
 	}
     render() {
         return (
