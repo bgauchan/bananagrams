@@ -39,11 +39,12 @@ const StyledSidebar = styled.aside`
 	.dump_zone {
 		border-top: 1px solid #efc876;
 		border-bottom: 1px solid #efc876;
+		color: white;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-top: 35px;
-		padding: 30px 30px 30px 35px;
+		margin: 35px 0;
+		padding: 30px;
 
 		li {
 			border: 2px dotted white;
@@ -52,7 +53,6 @@ const StyledSidebar = styled.aside`
 		}
 
 		span {
-			color: white;
 			font-size: 20px;
 			font-weight: bold;
 			max-width: 120px;
@@ -70,9 +70,10 @@ const StyledGameArea = styled.main`
 const StyledBoard = styled.ul`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    list-style-type: none;
+	list-style-type: none;
+	padding: 0 25px;
 
     li {
         border: 1px dotted #e6b242;
@@ -94,7 +95,12 @@ const StyledBoard = styled.ul`
         justify-content: center;
         height: 100%;
         width: 100%;
-    }
+	}
+	
+	li span {
+		color: #e6b242;
+		font-size: 24px;
+	}
 ` 
 const StyledGameBoard = styled(StyledBoard)`
 	justify-content: left;
@@ -106,7 +112,7 @@ const StyledGameBoard = styled(StyledBoard)`
         width: 80px;
 	}
 
-	span {;
+	span {
 		color: #e6b242;
 	}
 `
@@ -120,7 +126,8 @@ class Game extends Component {
 		this.state = {
 			personalStack: this.getShuffledPieces(this.props.numOfPersonalTiles),
 			gameStack: this.getShuffledPieces(this.props.numOfGameTiles),
-			solved: [...Array(360)]
+			solvedStack: [...Array(360)],
+			dumpStack: [...Array(1)]
 		}
     }
     componentDidMount() {
@@ -181,7 +188,7 @@ class Game extends Component {
 		// since we dragged it out, remove it from the original stack
 		let originStack = this.state[originStackName]
 		originStack[originOrder] = undefined	
-	
+		
 		// add it to new stack with update info like the new order in target stack
 		// and the board as well
 		targetStack[index] = {
@@ -214,13 +221,13 @@ class Game extends Component {
 					<div className="dump_zone">
 						<span>Dump a Tile here to trade it for 3 tiles</span>
 						<StyledBoard>
-							{ this.renderPieceContainer(undefined, 0, 'dump') }
+							{ this.state.dumpStack.map((piece, i) => this.renderPieceContainer(piece, i, 'dumpStack')) }
 						</StyledBoard>
 					</div>
 				</StyledSidebar>
 				<StyledGameArea>
 					<StyledGameBoard>
-						{this.state.solved.map((piece, i) => this.renderPieceContainer(piece, i, 'solved'))}
+						{this.state.solvedStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack'))}
 					</StyledGameBoard>
 				</StyledGameArea>
 

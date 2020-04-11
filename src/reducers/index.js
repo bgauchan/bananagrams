@@ -1,12 +1,8 @@
-import postsBySubreddit from './postsBySubreddit'
-import selectedSubreddit from './selectedSubreddit'
-import readPosts from './readPosts'
+import game from './game'
 import { combineReducers } from 'redux'
 
 const rootReducer = combineReducers({
-    readPosts,
-    postsBySubreddit,
-    selectedSubreddit,
+    game,
 })
 
 export default rootReducer

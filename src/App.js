@@ -21,7 +21,7 @@ class App extends Component {
 			numOfPersonalTiles = 15
 			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
 		}
-		
+
 		this.setState({ 
 			gameStarted: true,
 			numOfPlayers,
