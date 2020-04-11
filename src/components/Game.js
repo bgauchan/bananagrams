@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import GameButtons from './GameButtons'
 
 const StyledApp = styled.div`
 	background: #fbf6ef;
@@ -41,23 +42,6 @@ const StyledGameArea = styled.main`
 	height: 100vh;
 	padding: 40px;
 	overflow: scroll;
-
-	.button_area {
-		position: fixed;
-		top: 25px;
-		right: 15px;
-	}
-
-	button {
-		background: orange;
-		border-radius: 8px;
-		display: flex;
-		align-items: center;
-		font-size: 16px;
-		justify-content: center;
-		height: 40px;
-		width: 120px;
-	}
 `
 
 const StyledBoard = styled.ul`
@@ -199,24 +183,22 @@ class Game extends Component {
 				<StyledSidebar>
 					<div className="logo">
 						<img alt='logo' src='https://image.flaticon.com/icons/svg/575/575393.svg' />
-						<h1>Bananagrams</h1>
+						<h1>Plantaingrams</h1>
 					</div>
 					<StyledBoard>
 						{ this.state.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
 					</StyledBoard>
-					<div>
-						Game stack: { this.state.gameStack.length } tiles
-					</div>
 				</StyledSidebar>
 				<StyledGameArea>
 					<StyledGameBoard>
 						{this.state.solved.map((piece, i) => this.renderPieceContainer(piece, i, 'solved'))}
 					</StyledGameBoard>
-
-					<div className="button_area">
-						<button>Split</button>
-					</div>
 				</StyledGameArea>
+
+				<GameButtons 
+					personalStack={this.state.personalStack} 
+					gameStack={this.state.gameStack} 
+				/>
             </StyledApp>
         )
     }
