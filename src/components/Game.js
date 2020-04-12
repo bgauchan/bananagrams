@@ -140,14 +140,15 @@ class Game extends Component {
 			});
 		}
 	}
-	getShuffledPieces(count) {
+	getShuffledPieces(count, fillerTiles) {
 		let shuffledPieces = []
+		let personalStackCount = this.state ? this.state.personalStack.length : 0
 
         for(let i = 0; i < count; i++) {
 			let randomIndex = Math.floor(Math.random() * 25) + 1
 			shuffledPieces.push({
 				tile: pieces[randomIndex],
-				order: i,
+				order: fillerTiles ? personalStackCount++ : i,
 				board: 'personalStack'
 			})
 		}
@@ -188,7 +189,7 @@ class Game extends Component {
 		// since we dragged it out, remove it from the original stack
 		let originStack = this.state[originStackName]
 		originStack[originOrder] = undefined	
-		
+
 		// add it to new stack with update info like the new order in target stack
 		// and the board as well
 		targetStack[index] = {
@@ -196,16 +197,47 @@ class Game extends Component {
 			order: index,
 			board: targetName
 		}
-	
-		this.setState({ 
-			[originStackName]: originStack,
-			[targetName]: targetStack
-		})
+
+		if(targetName === 'dumpStack') {
+			// if its a tile being dumped, take 3 tiles from game stack
+			// and put it in personal stack AND take the dumped tile, and
+			// put it in the game stack		
+			let extraThreeTiles = this.getShuffledPieces(3, true)
+			let updatedPersonalStack = this.getPersonalStackAfterDump(extraThreeTiles)
+			
+			this.setState({ 
+				[originStackName]: originStack,
+				[targetName]: targetStack,
+				personalStack: updatedPersonalStack
+			})
+		} else {		
+			this.setState({ 
+				[originStackName]: originStack,
+				[targetName]: targetStack
+			})
+		}
     }
     handleDragStart(e, order, board) {
         const dt = e.dataTransfer
         dt.setData('text/plain', (order + '_' + board))
         dt.effectAllowed = 'move'
+	}
+	getPersonalStackAfterDump(extraThreeTiles) {		
+		let updatedStack = this.state.personalStack.map((tile, index) => {
+			// if there are empty slots, fill those up first
+			if(tile === undefined && extraThreeTiles.length > 0) {
+				return extraThreeTiles.shift() // take one of the extra tiles
+			} else {
+				return tile
+			}
+		})
+		
+		// if all the 3 extra tiles haven't been swapped in, add them to the end
+		if(extraThreeTiles.length > 0) {
+			updatedStack = [...updatedStack, ...extraThreeTiles]
+		}
+		
+		return updatedStack
 	}
     render() {
         return (
