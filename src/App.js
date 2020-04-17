@@ -1,59 +1,38 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import {
+    handleSetupAndStartGame,
+} from './actions'
 import StartScreen from './components/StartScreen'
 import Game from './components/Game'
 
-let totalTiles = 144
 
 class App extends Component {
-    state = {
-		gameStarted: false
-	}
-	startGame() {
-		let numOfPlayers = 6
-		let numOfPersonalTiles = 21
-		let numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-		
-		if(numOfPlayers > 6) {
-			numOfPersonalTiles = 11
-			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-		} else if(numOfPlayers > 4) {
-			numOfPersonalTiles = 15
-			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-		}
-
-		this.setState({ 
-			gameStarted: true,
-			numOfPlayers,
-			numOfPersonalTiles,
-			numOfGameTiles
-		})
-	}
     componentDidMount() {
-		this.startGame()
+		this.props.dispatch(handleSetupAndStartGame(5))
 	}
     render() {
-		const { gameStarted } = this.state
-
+		let { gameStarted } = this.props.syncState
+		
         return (
 			<div>
 				{ !gameStarted ? 
-					<StartScreen 
-						handleStartGame={() => this.startGame()} /> : 
 					<Game 
-						numOfPersonalTiles={ this.state.numOfPersonalTiles }
-						numOfGameTiles={ this.state.numOfGameTiles }
-					/> }
+						numOfPersonalTiles="21"
+						numOfGameTiles="52"
+					/> : 
+					<StartScreen 
+						handleStartGame={() => this.startGame()} /> 
+				}
 			</div>
 		)
     }
 }
 
 const mapStateToProps = (state, ownProps) => ({
-	selectedSubreddit: state.selectedSubreddit
+	syncState: state.syncState,
 })
 
 export default connect(
-	mapStateToProps,
-	// mapDispatchToProps
+	mapStateToProps
 )(App)

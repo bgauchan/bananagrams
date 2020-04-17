@@ -117,19 +117,7 @@ const StyledGameBoard = styled(StyledBoard)`
 	}
 `
 
-const pieces = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
 class Game extends Component {
-    constructor(props) {
-		super(props)
-		
-		this.state = {
-			personalStack: this.getShuffledPieces(this.props.numOfPersonalTiles),
-			gameStack: this.getShuffledPieces(this.props.numOfGameTiles),
-			solvedStack: [...Array(360)],
-			dumpStack: [...Array(1)]
-		}
-    }
     componentDidMount() {
         // use the center tile to center the dropzone area
 		let centerTile = document.querySelector('.center_tile');
@@ -139,21 +127,6 @@ class Game extends Component {
 				block: 'center',
 			});
 		}
-	}
-	getShuffledPieces(count, fillerTiles) {
-		let shuffledPieces = []
-		let personalStackCount = this.state ? this.state.personalStack.length : 0
-
-        for(let i = 0; i < count; i++) {
-			let randomIndex = Math.floor(Math.random() * 25) + 1
-			shuffledPieces.push({
-				tile: pieces[randomIndex],
-				order: fillerTiles ? personalStackCount++ : i,
-				board: 'personalStack'
-			})
-		}
-
-		return shuffledPieces
 	}
     renderPieceContainer(piece, index, boardName) {
         return (
@@ -174,9 +147,11 @@ class Game extends Component {
         );
     }
     handleDrop(e, index, targetName) {
+		let { localState } = this.props
+
 		// if you're dropping at the spot where a tile is already there, 
 		// do nothing
-        let targetStack = this.state[targetName];
+        let targetStack = localState[targetName];
         if (targetStack[index]) return;
 
 		// get the order of the tile dropped and the original board it was in
@@ -184,10 +159,10 @@ class Game extends Component {
 		const originOrderAndStack = e.dataTransfer.getData('text').split('_')
 		let originOrder = originOrderAndStack[0]
 		let originStackName = originOrderAndStack[1]
-		let originTile = this.state[originStackName].find(p => p && (p.order === +originOrder))
+		let originTile = localState[originStackName].find(p => p && (p.order === +originOrder))
 
 		// since we dragged it out, remove it from the original stack
-		let originStack = this.state[originStackName]
+		let originStack = localState[originStackName]
 		originStack[originOrder] = undefined	
 
 		// add it to new stack with update info like the new order in target stack
@@ -197,6 +172,10 @@ class Game extends Component {
 			order: index,
 			board: targetName
 		}
+
+		debugger
+
+		// Next Step: add action creators for updating stacks after dropping
 
 		if(targetName === 'dumpStack') {
 			// if its a tile being dumped, take 3 tiles from game stack
@@ -240,6 +219,8 @@ class Game extends Component {
 		return updatedStack
 	}
     render() {
+		let { syncState, localState } = this.props
+
         return (
             <StyledApp>
 				<StyledSidebar>
@@ -248,24 +229,24 @@ class Game extends Component {
 						<h1>Plantaingrams</h1>
 					</div>
 					<StyledBoard>
-						{ this.state.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
+						{ localState.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
 					</StyledBoard>
 					<div className="dump_zone">
 						<span>Dump a Tile here to trade it for 3 tiles</span>
 						<StyledBoard>
-							{ this.state.dumpStack.map((piece, i) => this.renderPieceContainer(piece, i, 'dumpStack')) }
+							{ localState.dumpStack.map((piece, i) => this.renderPieceContainer(piece, i, 'dumpStack')) }
 						</StyledBoard>
 					</div>
 				</StyledSidebar>
 				<StyledGameArea>
 					<StyledGameBoard>
-						{this.state.solvedStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack'))}
+						{ localState.solvedStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
 					</StyledGameBoard>
 				</StyledGameArea>
 
 				<GameButtons 
-					personalStack={this.state.personalStack} 
-					gameStack={this.state.gameStack} 
+					personalStack={localState.personalStack} 
+					gameStack={syncState.gameStack} 
 				/>
             </StyledApp>
         )
@@ -273,6 +254,8 @@ class Game extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+	syncState: state.syncState,
+	localState: state.localState
 })
 
 export default connect(

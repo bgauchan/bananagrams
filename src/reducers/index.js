@@ -1,8 +1,10 @@
-import game from './game'
+import syncState from './syncState'
+import localState from './localState'
 import { combineReducers } from 'redux'
 
 const rootReducer = combineReducers({
-    game,
+    syncState,
+    localState
 })
 
 export default rootReducer
