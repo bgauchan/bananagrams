@@ -18,8 +18,7 @@ const localState = (state = defaultState, action)  => {
         case MOVE_TILE:
             return {
                 ...state,
-                personalStack: action.updates.personalStack,
-                solvedStack: action.updates.solvedStack
+                ...action.updates
             }
         default:
            return state
