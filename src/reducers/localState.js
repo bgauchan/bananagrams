@@ -1,7 +1,5 @@
-import {
-    START_GAME,
-
-} from '../actions'
+import { START_GAME } from '../actions'
+import { MOVE_TILE } from '../actions/localState'
 
 let defaultState =  {
     personalStack: [],
@@ -16,6 +14,12 @@ const localState = (state = defaultState, action)  => {
             return {
                 ...state,
                 ...action.game.localState
+            }
+        case MOVE_TILE:
+            return {
+                ...state,
+                personalStack: action.updates.personalStack,
+                solvedStack: action.updates.solvedStack
             }
         default:
            return state
