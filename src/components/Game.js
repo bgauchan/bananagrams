@@ -86,8 +86,30 @@ const StyledBoard = styled.ul`
         font-weight: bold;
         height: 70px;
         width: 70px;
-        margin: 2px;
-    }
+		margin: 2px;
+		position: relative;
+	}
+
+	li.is_new {
+        border: 1px dotted #2196F3;
+	}
+	
+	li.is_new:after {
+		background: #2196F3;
+		border-bottom-left-radius: 4px;
+		border-top-right-radius: 4px;
+		color: white;
+		content: 'new';
+		font-size: 8px;
+		position: absolute;
+		right: 0;
+		top: 0;
+		padding: 1px 4px 2px;
+	}
+
+	li.is_new span {
+        color: #2196F3;
+	}
 
     span {
         background: white;
@@ -131,10 +153,23 @@ class Game extends Component {
 			});
 		}
 	}
+	getClassNames(index, piece) {
+		let names = ''
+
+		if(index === 194) {
+			names += 'center_tile '
+		}
+
+		if(piece && piece.isNew) {
+			names += 'is_new '
+		}
+
+		return names
+	}
     renderPieceContainer(piece, index, boardName) {
         return (
             <li
-				className={ index === 194 ? 'center_tile' : '' }
+				className={this.getClassNames(index, piece)}
                 key={index}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => this.handleDrop(e, index, boardName)}>

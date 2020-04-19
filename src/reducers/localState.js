@@ -19,7 +19,7 @@ const localState = (state = defaultState, action)  => {
         case DUMP_TILE:
             return {
                 ...state,
-                ...action.updates
+                ...action.updates.localStateUpdates
             }
         default:
            return state

@@ -59,19 +59,20 @@ function getPersonalStackAfterDump(personalStack) {
         if(tile === undefined && extraThreeTiles.length > 0) {
             let newTile = extraThreeTiles.shift() // take one of the extra tiles
             newTile.order = index
-            console.log(`order becomes => ${index}`)
+            newTile.isNew = true
             return newTile
         } else {
             return tile
         }
     })
     
-    let order = updatedStack.length
+    let nextOrder = updatedStack.length
     
     // if all the 3 extra tiles haven't been swapped in, add them to the end
     extraThreeTiles.forEach(tile => {
-        tile.order = order
-        order++
+        tile.order = nextOrder
+        tile.isNew = true
+        nextOrder++
         updatedStack.push(tile)
     })
     
@@ -80,16 +81,21 @@ function getPersonalStackAfterDump(personalStack) {
 
 export function handleDumpTile(updates) {
     return (dispatch, getState) => {        
-        let localState = getState().localState
+        let { syncState, localState } = getState()
 
         // if its a tile being dumped, take 3 tiles from game stack
         // and put it in personal stack AND take the dumped tile, and
         // put it in the game stack		
         let updatedPersonalStack = getPersonalStackAfterDump(localState.personalStack)
-        let finalUpdates = { 
+
+        let localStateUpdates = { 
             ...updates,
             personalStack: updatedPersonalStack,
             dumpStack: [undefined]
+        }
+
+        let finalUpdates = {
+            localStateUpdates
         }
 
         dispatch(dumpTile(finalUpdates))
