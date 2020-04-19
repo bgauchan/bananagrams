@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import GameButtons from './GameButtons'
 import {
-    handleMoveTile,
+    handleDumpOrMoveTile,
 } from '../actions/localState'
 
 const StyledApp = styled.div`
@@ -150,7 +150,7 @@ class Game extends Component {
         );
     }
     handleDrop(e, index, targetName) {
-		this.props.dispatch(handleMoveTile(e, index, targetName))
+		this.props.dispatch(handleDumpOrMoveTile(e, index, targetName))
     }
     handleDragStart(e, order, board) {
         const dt = e.dataTransfer

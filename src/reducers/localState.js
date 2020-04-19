@@ -1,4 +1,4 @@
-import { START_GAME } from '../actions'
+import { START_GAME, DUMP_TILE } from '../actions'
 import { MOVE_TILE } from '../actions/localState'
 
 let defaultState =  {
@@ -16,6 +16,7 @@ const localState = (state = defaultState, action)  => {
                 ...action.game.localState
             }
         case MOVE_TILE:
+        case DUMP_TILE:
             return {
                 ...state,
                 ...action.updates
