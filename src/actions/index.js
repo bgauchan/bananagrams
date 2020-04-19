@@ -83,6 +83,12 @@ export function handleDumpTile(updates) {
     return (dispatch, getState) => {        
         let { syncState, localState } = getState()
 
+        // only dump if the game stack has more than 3 tiles left
+        if(syncState.gameStack.length < 3) {
+            // dispatch a notification here
+            return
+        }
+
         // if its a tile being dumped, take 3 tiles from game stack
         // and put it in personal stack AND take the dumped tile, and
         // put it in the game stack		
@@ -94,8 +100,12 @@ export function handleDumpTile(updates) {
             dumpStack: [undefined]
         }
 
+        let updatedGameStack = [...syncState.gameStack]
+        updatedGameStack.splice(0, 3)
+
         let finalUpdates = {
-            localStateUpdates
+            localStateUpdates,
+            syncStateUpdates: updatedGameStack
         }
 
         dispatch(dumpTile(finalUpdates))
