@@ -1,5 +1,5 @@
-import { START_GAME, DUMP_TILE } from '../actions'
-import { MOVE_TILE } from '../actions/localState'
+import { DUMP_TILE } from '../actions/syncState'
+import { INITIALIZE_LOCAL_STATE, MOVE_TILE } from '../actions/localState'
 
 let defaultState =  {
     personalStack: [],
@@ -10,10 +10,10 @@ let defaultState =  {
 
 const localState = (state = defaultState, action)  => {
     switch (action.type) {
-        case START_GAME:
+        case INITIALIZE_LOCAL_STATE:
             return {
                 ...state,
-                ...action.game.localState
+                ...action.localState
             }
         case MOVE_TILE:
         case DUMP_TILE:

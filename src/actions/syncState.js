@@ -1,30 +1,16 @@
 import db from '../firebase'
 import { getShuffledPieces } from '../helpers'
 
-export const START_GAME = 'START_GAME'
+export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
 export const DUMP_TILE = 'DUMP_TILE'
 
-function startGame(game) {
-    return { type: START_GAME, game }
+const settingsRef = db.ref('game/settings')
+
+function initializeSyncState(syncState) {
+    return { type: INITIALIZE_SYNC_STATE, syncState }
 }
 
-function dumpTile(updates) {
-    return { type: DUMP_TILE, updates }
-}
-
-export function handleSetupAndStartGame(numOfPlayers) {
-    let totalTiles = 144
-    let numOfPersonalTiles = 21
-    let numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-
-    if(numOfPlayers > 6) {
-        numOfPersonalTiles = 11
-        numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-    } else if(numOfPlayers > 4) {
-        numOfPersonalTiles = 15
-        numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-    }
-
+export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles) {
     // only save the syncState with firebase
     return (dispatch, getState) => {
         let syncState = {
@@ -34,21 +20,16 @@ export function handleSetupAndStartGame(numOfPlayers) {
             gameStack: getShuffledPieces(numOfGameTiles)
         }
 
-        let prevLocalState = getState().localState
-    
-        let localState = {
-            ...prevLocalState,
-            personalStack: getShuffledPieces(numOfPersonalTiles)
-        }
-
-        db.ref('game').set({
-            settings: syncState
-        })
+        settingsRef.set(syncState)
         .then(() => {
-            dispatch(startGame({ syncState, localState }))
+            dispatch(initializeSyncState(syncState))
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
     }
+}
+
+function dumpTile(updates) {
+    return { type: DUMP_TILE, updates }
 }
 
 function getPersonalStackAfterDump(personalStack) {		
@@ -107,20 +88,16 @@ export function handleDumpTile(updates) {
             localStateUpdates,
             syncStateUpdates: updatedGameStack
         }
-
-        dispatch(dumpTile(finalUpdates))
-
-        // let localState = {
-        //     ...prevLocalState,
-        //     personalStack: getShuffledPieces(numOfPersonalTiles)
-        // }
-
-        // db.ref('game').set({
-        //     settings: syncState
-        // })
-        // .then(() => {
-        //     dispatch(startGame({ syncState, localState }))
-        // })
-        // .catch((error) => console.error("Firebase: error adding document: ", error))    
+        
+        // update db
+        settingsRef.transaction(function(currentGameStack) {
+            return {
+                gameStack: updatedGameStack
+            }
+        })
+        .then(() => {
+            dispatch(dumpTile(finalUpdates))
+        })
+        .catch((error) => console.error("Firebase: error adding document: ", error))    
     }
 }

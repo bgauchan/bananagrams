@@ -1,7 +1,7 @@
 import {
-    START_GAME,
+    INITIALIZE_SYNC_STATE,
     DUMP_TILE
-} from '../actions'
+} from '../actions/syncState'
 
 let defaultState =  {
     gameStarted: false
@@ -9,10 +9,10 @@ let defaultState =  {
   
 const syncState = (state = defaultState, action)  => {    
     switch (action.type) {
-        case START_GAME:
+        case INITIALIZE_SYNC_STATE:
             return {
                 ...state,
-                ...action.game.syncState
+                ...action.syncState
             }
         case DUMP_TILE:
             return {
