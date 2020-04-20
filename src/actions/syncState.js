@@ -54,9 +54,10 @@ export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numO
             // as soon as we detect any update
             settingsRef.on('value', function(snapshot) {
                 let { syncState } = getState()
+                let updates = snapshot.val()
                 
                 if(syncState.gameStarted) {
-                    dispatch(updateSyncState(snapshot.val()))
+                    dispatch(updateSyncState({ ...updates, gameStarted: true }))
                 }
             });
         })
