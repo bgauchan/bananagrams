@@ -1,5 +1,9 @@
 
-import { INITIALIZE_LOCAL_STATE, UPDATE_LOCAL_STATE } from '../actions/localState'
+import { 
+    INITIALIZE_LOCAL_STATE, 
+    UPDATE_LOCAL_STATE,
+    REMOVE_NEW_STATUS
+} from '../actions/localState'
 
 let defaultState =  {
     personalStack: [],
@@ -16,6 +20,7 @@ const localState = (state = defaultState, action)  => {
                 ...action.localState
             }
         case UPDATE_LOCAL_STATE:
+        case REMOVE_NEW_STATUS:
             return {
                 ...state,
                 ...action.updates

@@ -10,6 +10,7 @@ export function getShuffledPieces(count) {
         shuffledPieces.push({
             tile: pieces[randomIndex],
             order: i,
+            isNew: false,
             board: 'personalStack'
         })
     }

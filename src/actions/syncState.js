@@ -1,6 +1,6 @@
 import db from '../firebase'
 import { getShuffledPieces } from '../helpers'
-import { updateLocalState } from './localState'
+import { updateLocalState, handleRemoveNewStatus } from './localState'
 
 export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
 export const UPDATE_SYNC_STATE = 'UPDATE_SYNC_STATE'
@@ -82,7 +82,7 @@ export function handleDumpTile(updates) {
         let updatedPersonalStack = getPersonalStackAfterDump(localState.personalStack)
 
         let localStateUpdates = { 
-            ...updates,
+            ...updates.localState,
             personalStack: updatedPersonalStack,
             dumpStack: [undefined]
         }
@@ -104,6 +104,11 @@ export function handleDumpTile(updates) {
             dispatch(dumpTile(updates.tile))
             dispatch(updateLocalState(localStateUpdates))
             dispatch(updateSyncState(syncStateUpdates))
+
+            // remove new status from tiles in personal stack after 5s
+            setTimeout(() => {
+                dispatch(handleRemoveNewStatus())
+            }, 5000);
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
     }

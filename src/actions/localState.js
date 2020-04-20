@@ -5,6 +5,7 @@ import { handleDumpTile } from './syncState'
 export const INITIALIZE_LOCAL_STATE = 'INITIALIZE_LOCAL_STATE'
 export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
 export const MOVE_TILE = 'MOVE_TILE'
+export const REMOVE_NEW_STATUS = 'REMOVE_NEW_STATUS'
 
 function initializeLocalState(localState) {
     return { type: INITIALIZE_LOCAL_STATE, localState }
@@ -81,5 +82,27 @@ export function handleDumpOrMoveTile(e, index, targetName) {
             dispatch(moveTile(updates.tile))
             dispatch(updateLocalState(updates.localState))
         }
+    }
+}
+
+function removeNewStatus(updates) {
+    return { type: REMOVE_NEW_STATUS, updates }
+}
+
+export function handleRemoveNewStatus() {
+    return (dispatch, getState) => { 
+        let { localState } = getState()
+        let updatedPersonalStack = [ ...localState.personalStack ]
+        let updatedSolvedStack = [ ...localState.solvedStack ]
+        
+        updatedPersonalStack.map(tile => tile ? tile.isNew = false : undefined)
+        updatedSolvedStack.map(tile => tile ? tile.isNew = false : undefined)
+
+        let update = {
+            personalStack: updatedPersonalStack,
+            solvedStack: updatedSolvedStack
+        }
+
+        dispatch(removeNewStatus(update))
     }
 }
