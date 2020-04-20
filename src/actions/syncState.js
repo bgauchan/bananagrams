@@ -4,9 +4,31 @@ import { updateLocalState, handleRemoveNewStatus } from './localState'
 
 export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
 export const UPDATE_SYNC_STATE = 'UPDATE_SYNC_STATE'
+export const START_GAME = 'START_GAME'
 export const DUMP_TILE = 'DUMP_TILE'
 
 const settingsRef = db.ref('game/settings')
+
+function startGame() {
+    return { type: START_GAME, gameStarted: true }
+}
+
+export function handleStartGame() {
+    return (dispatch, getState) => {
+        let { syncState } = getState()
+
+        let updatedSyncState = {
+            ...syncState,
+            gameStarted: true
+        }
+        
+        settingsRef.set(updatedSyncState)
+        .then(() => {
+            dispatch(startGame())
+        })
+        .catch((error) => console.error("Firebase: error adding document: ", error))    
+    }
+}
 
 function initializeSyncState(syncState) {
     return { type: INITIALIZE_SYNC_STATE, syncState }
@@ -16,6 +38,7 @@ export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numO
     // only save the syncState with firebase
     return (dispatch, getState) => {
         let syncState = {
+            gameStarted: false,
             numOfPlayers,
             numOfPersonalTiles,
             numOfGameTiles,
@@ -25,6 +48,7 @@ export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numO
         settingsRef.set(syncState)
         .then(() => {
             dispatch(initializeSyncState(syncState))
+            dispatch(handleStartGame())
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
     }

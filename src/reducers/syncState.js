@@ -1,4 +1,5 @@
 import {
+    START_GAME,
     INITIALIZE_SYNC_STATE,
     UPDATE_SYNC_STATE
 } from '../actions/syncState'
@@ -9,6 +10,11 @@ let defaultState =  {
   
 const syncState = (state = defaultState, action)  => {    
     switch (action.type) {
+        case START_GAME:
+            return {
+                ...state,
+                gameStarted: action.gameStarted
+            }
         case INITIALIZE_SYNC_STATE:
             return {
                 ...state,
@@ -17,7 +23,7 @@ const syncState = (state = defaultState, action)  => {
         case UPDATE_SYNC_STATE:
             return {
                 ...state,
-                'gameStack': action.updates.syncStateUpdates
+                gameStack: action.updates.syncStateUpdates
             }
         default:
            return state
