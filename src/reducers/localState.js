@@ -1,5 +1,5 @@
-import { DUMP_TILE } from '../actions/syncState'
-import { INITIALIZE_LOCAL_STATE, MOVE_TILE } from '../actions/localState'
+
+import { INITIALIZE_LOCAL_STATE, UPDATE_LOCAL_STATE } from '../actions/localState'
 
 let defaultState =  {
     personalStack: [],
@@ -15,11 +15,10 @@ const localState = (state = defaultState, action)  => {
                 ...state,
                 ...action.localState
             }
-        case MOVE_TILE:
-        case DUMP_TILE:
+        case UPDATE_LOCAL_STATE:
             return {
                 ...state,
-                ...action.updates.localStateUpdates
+                ...action.updates
             }
         default:
            return state

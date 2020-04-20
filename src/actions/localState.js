@@ -3,6 +3,7 @@ import { getShuffledPieces } from '../helpers'
 import { handleDumpTile } from './syncState'
 
 export const INITIALIZE_LOCAL_STATE = 'INITIALIZE_LOCAL_STATE'
+export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
 export const MOVE_TILE = 'MOVE_TILE'
 
 function initializeLocalState(localState) {
@@ -22,8 +23,12 @@ export function handleInitializeLocalState(numOfPersonalTiles) {
     }
 }
 
-function moveTile(updates) {
-    return { type: MOVE_TILE, updates }
+function moveTile(tile) {
+    return { type: MOVE_TILE, tile }
+}
+
+export function updateLocalState(updates) {
+    return { type: UPDATE_LOCAL_STATE, updates }
 }
 
 function getUpdates(e, index, targetName, localState) {
@@ -51,9 +56,12 @@ function getUpdates(e, index, targetName, localState) {
         board: targetName
     }
 
-    return { 
-        [originStackName]: originStack,
-        [targetName]: targetStack
+    return {
+        tile: originTile,
+        localState: { 
+            [originStackName]: originStack,
+            [targetName]: targetStack
+        }
     }
 }
 
@@ -65,10 +73,13 @@ export function handleDumpOrMoveTile(e, index, targetName) {
         // if no update was made, don't dispatch
         if(!updates) return
 
+        // if just moving tiles, then it doesn't affect our sync state
+        // where as dumping tile affects both state
         if(targetName === 'dumpStack') {
             dispatch(handleDumpTile(updates))
         } else {
-            dispatch(moveTile(updates))
+            dispatch(moveTile(updates.tile))
+            dispatch(updateLocalState(updates.localState))
         }
     }
 }

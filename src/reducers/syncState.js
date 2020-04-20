@@ -1,6 +1,6 @@
 import {
     INITIALIZE_SYNC_STATE,
-    DUMP_TILE
+    UPDATE_SYNC_STATE
 } from '../actions/syncState'
 
 let defaultState =  {
@@ -14,7 +14,7 @@ const syncState = (state = defaultState, action)  => {
                 ...state,
                 ...action.syncState
             }
-        case DUMP_TILE:
+        case UPDATE_SYNC_STATE:
             return {
                 ...state,
                 'gameStack': action.updates.syncStateUpdates

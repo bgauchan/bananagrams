@@ -1,7 +1,9 @@
 import db from '../firebase'
 import { getShuffledPieces } from '../helpers'
+import { updateLocalState } from './localState'
 
 export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
+export const UPDATE_SYNC_STATE = 'UPDATE_SYNC_STATE'
 export const DUMP_TILE = 'DUMP_TILE'
 
 const settingsRef = db.ref('game/settings')
@@ -28,8 +30,12 @@ export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numO
     }
 }
 
-function dumpTile(updates) {
-    return { type: DUMP_TILE, updates }
+function dumpTile(tile) {
+    return { type: DUMP_TILE, tile }
+}
+
+function updateSyncState(updates) {
+    return { type: UPDATE_SYNC_STATE, updates }
 }
 
 function getPersonalStackAfterDump(personalStack) {		
@@ -84,8 +90,7 @@ export function handleDumpTile(updates) {
         let updatedGameStack = [...syncState.gameStack]
         updatedGameStack.splice(0, 3)
 
-        let finalUpdates = {
-            localStateUpdates,
+        let syncStateUpdates = {
             syncStateUpdates: updatedGameStack
         }
         
@@ -96,7 +101,9 @@ export function handleDumpTile(updates) {
             }
         })
         .then(() => {
-            dispatch(dumpTile(finalUpdates))
+            dispatch(dumpTile(updates.tile))
+            dispatch(updateLocalState(localStateUpdates))
+            dispatch(updateSyncState(syncStateUpdates))
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
     }
