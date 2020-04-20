@@ -1,17 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import db from './firebase'
 import { handleInitializeSyncState } from './actions/syncState'
 import { handleInitializeLocalState } from './actions/localState'
 import StartScreen from './components/StartScreen'
 import Game from './components/Game'
 
-const settingsRef = db.ref('game/settings')
 
 class App extends Component {
     componentDidMount() {
 		let { dispatch } = this.props
-
+		
 		let numOfPlayers = 5
 		let totalTiles = 144
 		let numOfPersonalTiles = 21
@@ -24,10 +22,6 @@ class App extends Component {
 			numOfPersonalTiles = 15
 			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
 		}
-
-		settingsRef.on('value', function(snapshot) {
-			console.log('snapshot value => ', snapshot.val())
-		});
 
 		dispatch(handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles))
 		dispatch(handleInitializeLocalState(numOfPersonalTiles))

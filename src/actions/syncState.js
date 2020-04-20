@@ -37,7 +37,7 @@ function initializeSyncState(syncState) {
 export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles) {
     // only save the syncState with firebase
     return (dispatch, getState) => {
-        let syncState = {
+        let initialState = {
             gameStarted: false,
             numOfPlayers,
             numOfPersonalTiles,
@@ -45,10 +45,20 @@ export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numO
             gameStack: getShuffledPieces(numOfGameTiles)
         }
 
-        settingsRef.set(syncState)
+        settingsRef.set(initialState)
         .then(() => {
-            dispatch(initializeSyncState(syncState))
+            dispatch(initializeSyncState(initialState))
             dispatch(handleStartGame())
+
+            // put a listener on settings ref so we can dispatch updates
+            // as soon as we detect any update
+            settingsRef.on('value', function(snapshot) {
+                let { syncState } = getState()
+                
+                if(syncState.gameStarted) {
+                    dispatch(updateSyncState(snapshot.val()))
+                }
+            });
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
     }
@@ -113,21 +123,17 @@ export function handleDumpTile(updates) {
 
         let updatedGameStack = [...syncState.gameStack]
         updatedGameStack.splice(0, 3)
-
-        let syncStateUpdates = {
-            syncStateUpdates: updatedGameStack
-        }
         
         // update db
-        settingsRef.transaction(function(currentGameStack) {
+        settingsRef.transaction(function(prevSettings) {
             return {
+                ...prevSettings,
                 gameStack: updatedGameStack
             }
         })
         .then(() => {
             dispatch(dumpTile(updates.tile))
             dispatch(updateLocalState(localStateUpdates))
-            dispatch(updateSyncState(syncStateUpdates))
 
             // remove new status from tiles in personal stack after 5s
             setTimeout(() => {

@@ -23,7 +23,7 @@ const syncState = (state = defaultState, action)  => {
         case UPDATE_SYNC_STATE:
             return {
                 ...state,
-                gameStack: action.updates.syncStateUpdates
+                ...action.updates
             }
         default:
            return state
