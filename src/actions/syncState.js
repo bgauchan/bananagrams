@@ -123,7 +123,9 @@ export function handleDumpTile(updates) {
         }
 
         let updatedGameStack = [...syncState.gameStack]
-        updatedGameStack.splice(0, 3)
+        // user dumps 1 back in, game stack gives 3 out
+        // so the deduction from stack is 2 tiles
+        updatedGameStack.splice(0, 2) 
         
         // update db
         settingsRef.transaction(function(prevSettings) {
