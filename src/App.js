@@ -1,10 +1,32 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import styled from 'styled-components'
 import { handleInitializeSyncState } from './actions/syncState'
 import { handleInitializeLocalState } from './actions/localState'
 import StartScreen from './components/StartScreen'
 import Game from './components/Game'
+import Notification from './components/Notification'
 
+const StyledNotificationsList = styled.ul`
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	top: 15px;
+	right: 25px;
+	z-index: 1;
+
+	li {
+		background: #03a9f4;
+		border-radius: 20px;
+		color: white;
+		font-size: 14px;
+		margin-bottom: 10px;
+		min-width: 140px;
+		max-width: 240px;
+		padding: 10px 15px;
+		text-align: center;
+	}
+`
 
 class App extends Component {
     componentDidMount() {
@@ -27,10 +49,19 @@ class App extends Component {
 		dispatch(handleInitializeLocalState(numOfPersonalTiles))
 	}
     render() {
-		let { gameStarted } = this.props.syncState
+		let { gameStarted } = this.props.syncState	
+		let notifications = this.props.notifications	
 		
         return (
 			<div>
+				{ notifications.length > 0 && (
+					<StyledNotificationsList>
+						{ notifications.map(notif => (
+							<Notification key={notif.id} text={notif.text}></Notification>
+						))}
+					</StyledNotificationsList>
+				)}
+
 				{ gameStarted ? 
 					<Game /> : 
 					<StartScreen 
@@ -42,6 +73,7 @@ class App extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+	notifications: state.notifications,
 	syncState: state.syncState,
 })
 

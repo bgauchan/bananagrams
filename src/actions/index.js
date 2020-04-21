@@ -13,10 +13,10 @@ export function handleSendNotification(notification) {
 
         dispatch(sendNotification(notification))
 
-        // remove notification after 5 seconds
+        // remove notification after 4 seconds
         setTimeout(() => {
             dispatch(removeNotification(notificationID))
-        }, 5000);
+        }, 4000);
     }
 }
 

@@ -1,5 +1,6 @@
 import db from '../firebase'
 import { getShuffledPieces } from '../helpers'
+import { handleSendNotification } from './index'
 import { updateLocalState, handleRemoveNewStatus } from './localState'
 
 export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
@@ -135,6 +136,11 @@ export function handleDumpTile(updates) {
             }
         })
         .then(() => {
+            dispatch(handleSendNotification({
+                type: 'dumpTile',
+                text: 'Player 2 just dumped a tile'
+            }))
+            
             dispatch(dumpTile(updates.tile))
             dispatch(updateLocalState(localStateUpdates))
 

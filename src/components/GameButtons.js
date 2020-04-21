@@ -4,7 +4,7 @@ import styled from 'styled-components'
 const StyledButtonsArea = styled.section`
     background: white;
     border: 1px solid #e6b242;
-    border-radius: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,7 +27,7 @@ const StyledButtonsArea = styled.section`
 
 	button {
 		background: #ff7272;
-        border-radius: 28px;
+        border-radius: 10px;
         color: white;
 		display: flex;
 		align-items: center;
