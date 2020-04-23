@@ -6,6 +6,7 @@ import {
 } from '../actions/localState'
 
 let defaultState =  {
+    isPlaying: false,
     personalStack: [],
     solvedStack: [...Array(360)],
     dumpStack: [...Array(1)]

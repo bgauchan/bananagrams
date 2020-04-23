@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import { handleCreateGame } from '../actions'
 
 const StyledSection = styled.section`
-    background: #f9ea99;
+    background: #f9db5c;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -29,13 +30,36 @@ const StyledSection = styled.section`
         width: 60px;
         margin: 0 3px;
     }
+
+    button {
+		background: #ff7272;
+        border-radius: 10px;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 40px;
+        padding: 10px 20px;
+    }
+
+    a {
+        color: #8e6c06;
+        margin-top: 30px;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
 ` 
 
-class StartScreen extends Component {    
+class StartScreen extends Component {
+	createGame() {
+		this.props.dispatch(handleCreateGame())
+	}
     render() {
         return (
             <StyledSection>
-                <h1>Welcome To</h1>
+                <h1>LETS PLAY</h1>
                 <div className="bananagram">
                     <span>B</span>
                     <span>A</span>
@@ -47,10 +71,15 @@ class StartScreen extends Component {
                     <span>R</span>
                     <span>A</span>
                     <span>M</span>
+                    <span>S</span>
                 </div>
-                <button onClick={() => this.props.handleStartGame()}>
-                    SPLIT
+                <button onClick={() => this.createGame()}>
+                    New Game
                 </button>
+                <a href="https://bananagrams.com/blog/how-to-play-bananagrams-instructions-for-getting-started" 
+                    target="_blank" rel="noopener noreferrer">
+                    Read the rules
+                </a>
             </StyledSection>
           );
     }

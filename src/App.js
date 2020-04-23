@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { handleInitializeSyncState } from './actions/syncState'
-import { handleInitializeLocalState } from './actions/localState'
 import StartScreen from './components/StartScreen'
-import Game from './components/Game'
+import SetupScreen from './components/SetupScreen'
 import Notification from './components/Notification'
+import { handleSetupGame } from './actions'
 
 const StyledNotificationsList = styled.ul`
 	display: flex;
@@ -30,27 +29,10 @@ const StyledNotificationsList = styled.ul`
 
 class App extends Component {
     componentDidMount() {
-		let { dispatch } = this.props
-		
-		let numOfPlayers = 5
-		let totalTiles = 144
-		let numOfPersonalTiles = 21
-		let numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-	
-		if(numOfPlayers > 6) {
-			numOfPersonalTiles = 11
-			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-		} else if(numOfPlayers > 4) {
-			numOfPersonalTiles = 15
-			numOfGameTiles = totalTiles - (numOfPlayers * numOfPersonalTiles)
-		}
-
-		dispatch(handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles))
-		dispatch(handleInitializeLocalState(numOfPersonalTiles))
-	}
+        this.props.dispatch(handleSetupGame())
+    }
     render() {
-		let { gameStarted } = this.props.syncState	
-		let notifications = this.props.notifications	
+		let { notifications, syncState } = this.props
 		
         return (
 			<div>
@@ -62,10 +44,9 @@ class App extends Component {
 					</StyledNotificationsList>
 				)}
 
-				{ gameStarted ? 
-					<Game /> : 
-					<StartScreen 
-						handleStartGame={() => this.startGame()} /> 
+				{ syncState.errorMessage ? 
+					<h1> { syncState.errorMessage } </h1> : 
+					syncState.gameID ? <SetupScreen /> : <StartScreen  />
 				}
 			</div>
 		)
@@ -74,7 +55,7 @@ class App extends Component {
 
 const mapStateToProps = (state, ownProps) => ({
 	notifications: state.notifications,
-	syncState: state.syncState,
+	syncState: state.syncState
 })
 
 export default connect(

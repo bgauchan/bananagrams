@@ -1,5 +1,4 @@
 
-import { getShuffledPieces } from '../helpers'
 import { handleDumpTile } from './syncState'
 
 export const INITIALIZE_LOCAL_STATE = 'INITIALIZE_LOCAL_STATE'
@@ -7,22 +6,22 @@ export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
 export const MOVE_TILE = 'MOVE_TILE'
 export const REMOVE_NEW_STATUS = 'REMOVE_NEW_STATUS'
 
-function initializeLocalState(localState) {
-    return { type: INITIALIZE_LOCAL_STATE, localState }
-}
+// function initializeLocalState(localState) {
+//     return { type: INITIALIZE_LOCAL_STATE, localState }
+// }
 
-export function handleInitializeLocalState(numOfPersonalTiles) {
-    return (dispatch, getState) => {
-        let prevLocalState = getState().localState
+// export function handleInitializeLocalState(numOfPersonalTiles) {
+//     return (dispatch, getState) => {
+//         let prevLocalState = getState().localState
     
-        let localState = {
-            ...prevLocalState,
-            personalStack: getShuffledPieces(numOfPersonalTiles)
-        }
+//         let localState = {
+//             ...prevLocalState,
+//             personalStack: getShuffledPieces(numOfPersonalTiles)
+//         }
         
-        dispatch(initializeLocalState(localState)) 
-    }
-}
+//         dispatch(initializeLocalState(localState)) 
+//     }
+// }
 
 function moveTile(tile) {
     return { type: MOVE_TILE, tile }

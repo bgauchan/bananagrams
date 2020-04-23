@@ -1,5 +1,4 @@
 import db from '../firebase'
-import { getShuffledPieces } from '../helpers'
 import { handleSendNotification } from './index'
 import { updateLocalState, handleRemoveNewStatus } from './localState'
 
@@ -31,51 +30,52 @@ export function handleStartGame() {
     }
 }
 
-function initializeSyncState(syncState) {
-    return { type: INITIALIZE_SYNC_STATE, syncState }
-}
+// function initializeSyncState(syncState) {
+//     return { type: INITIALIZE_SYNC_STATE, syncState }
+// }
 
-export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles) {
-    // only save the syncState with firebase
-    return (dispatch, getState) => {
-        let initialState = {
-            gameStarted: false,
-            numOfPlayers,
-            numOfPersonalTiles,
-            numOfGameTiles,
-            gameStack: getShuffledPieces(numOfGameTiles)
-        }
+// export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles) {
+//     // only save the syncState with firebase
+//     return (dispatch, getState) => {
+//         let initialState = {
+//             gameStarted: false,
+//             numOfPlayers,
+//             numOfPersonalTiles,
+//             numOfGameTiles,
+//             gameStack: getShuffledPieces(numOfGameTiles)
+//         }
 
-        settingsRef.set(initialState)
-        .then(() => {
-            dispatch(initializeSyncState(initialState))
-            dispatch(handleStartGame())
+//         settingsRef.set(initialState)
+//         .then(() => {
+//             dispatch(initializeSyncState(initialState))
+//             dispatch(handleStartGame())
 
-            // put a listener on settings ref so we can dispatch updates
-            // as soon as we detect any update
-            settingsRef.on('value', function(snapshot) {
-                let { syncState } = getState()
-                let updates = snapshot.val()
+//             // put a listener on settings ref so we can dispatch updates
+//             // as soon as we detect any update
+//             settingsRef.on('value', function(snapshot) {
+//                 let { syncState } = getState()
+//                 let updates = snapshot.val()
                 
-                if(syncState.gameStarted) {
-                    dispatch(updateSyncState({ ...updates, gameStarted: true }))
-                }
-            });
-        })
-        .catch((error) => console.error("Firebase: error adding document: ", error))    
-    }
-}
+//                 if(syncState.gameStarted) {
+//                     dispatch(updateSyncState({ ...updates, gameStarted: true }))
+//                 }
+//             });
+//         })
+//         .catch((error) => console.error("Firebase: error adding document: ", error))    
+//     }
+// }
 
 function dumpTile(tile) {
     return { type: DUMP_TILE, tile }
 }
 
-function updateSyncState(updates) {
-    return { type: UPDATE_SYNC_STATE, updates }
-}
+// function updateSyncState(updates) {
+//     return { type: UPDATE_SYNC_STATE, updates }
+// }
 
 function getPersonalStackAfterDump(personalStack) {		
-    let extraThreeTiles = getShuffledPieces(3)
+    // let extraThreeTiles = getShuffledTiles(3)
+    let extraThreeTiles = []
 
     let updatedStack = personalStack.map((tile, index) => {
         // if there are empty slots, fill those up first
@@ -140,7 +140,7 @@ export function handleDumpTile(updates) {
                 type: 'dumpTile',
                 text: 'Player 2 just dumped a tile'
             }))
-            
+
             dispatch(dumpTile(updates.tile))
             dispatch(updateLocalState(localStateUpdates))
 

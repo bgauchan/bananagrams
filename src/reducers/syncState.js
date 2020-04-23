@@ -4,12 +4,13 @@ import {
     UPDATE_SYNC_STATE
 } from '../actions/syncState'
 
-let defaultState =  {
-    gameStarted: false
-}
-  
-const syncState = (state = defaultState, action)  => {    
+import { SETUP_GAME_FROM_SERVER, SETUP_GAME, ERROR_NO_GAME, CREATE_GAME } from '../actions'
+
+const syncState = (state = {}, action)  => {    
     switch (action.type) {
+        case SETUP_GAME_FROM_SERVER:
+        case SETUP_GAME:
+            return action.syncState
         case START_GAME:
             return {
                 ...state,
@@ -20,10 +21,20 @@ const syncState = (state = defaultState, action)  => {
                 ...state,
                 ...action.syncState
             }
+        case CREATE_GAME:
+            return {
+                ...state,
+                ...action.syncState
+            }
         case UPDATE_SYNC_STATE:
             return {
                 ...state,
                 ...action.updates
+            }
+        case ERROR_NO_GAME:
+            return {
+                ...state,
+                errorMessage: action.message
             }
         default:
            return state
