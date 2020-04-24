@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import StartScreen from './components/StartScreen'
-import SetupScreen from './components/SetupScreen'
+import WaitingRoom from './components/WaitingRoom'
 import Notification from './components/Notification'
 import { handleSetupGame } from './actions'
 
@@ -46,7 +46,7 @@ class App extends Component {
 
 				{ syncState.errorMessage ? 
 					<h1> { syncState.errorMessage } </h1> : 
-					syncState.gameID ? <SetupScreen /> : <StartScreen  />
+					syncState.gameID ? <WaitingRoom /> : <StartScreen  />
 				}
 			</div>
 		)

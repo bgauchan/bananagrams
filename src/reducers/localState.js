@@ -5,6 +5,10 @@ import {
     REMOVE_NEW_STATUS
 } from '../actions/localState'
 
+import {
+    PLAYER_SELECTED
+} from '../actions'
+
 let defaultState =  {
     isPlaying: false,
     personalStack: [],
@@ -25,6 +29,11 @@ const localState = (state = defaultState, action)  => {
             return {
                 ...state,
                 ...action.updates
+            }
+        case PLAYER_SELECTED:
+            return {
+                ...state,
+                playerSelected: action.playerID
             }
         default:
            return state

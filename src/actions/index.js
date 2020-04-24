@@ -6,6 +6,10 @@ export const CREATE_GAME = 'CREATE_GAME'
 export const SETUP_GAME = 'SETUP_GAME'
 export const SETUP_GAME_FROM_SERVER = 'SETUP_GAME_FROM_SERVER'
 export const ERROR_NO_GAME = 'ERROR_NO_GAME'
+
+export const PLAYER_SELECTED = 'PLAYER_SELECTED'
+export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
+
 export const SEND_NOTIFICATION = 'SEND_NOTIFICATION'
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION'
 
@@ -69,6 +73,47 @@ export function handleCreateGame() {
         })
     }
 }
+
+export function handlePlayers() { 
+    return (dispatch, getState) => {
+        let { syncState } = getState()
+        let gameID = syncState.gameID
+
+        // put a listener on settings ref so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/players').on('value', function(snapshot) {
+            dispatch({
+                type: UPDATE_SELECTED_PLAYERS,
+                players: snapshot.val()
+            })
+        });
+    }
+}
+
+export function handleSelectPlayer(playerID) {
+    return (dispatch, getState) => {
+        let { syncState } = getState()
+        let gameID = syncState.gameID
+
+        // update db
+        db.ref('/game/' + gameID + '/players').transaction((players) => {
+            if(players) {
+                return [ ...players, playerID]                
+            }
+
+            return [playerID]
+        })
+        .then(() => {
+            dispatch({
+                type: PLAYER_SELECTED,
+                playerID: playerID
+            })
+        })
+        .catch((error) => console.error("Firebase: error adding document: ", error))    
+    }
+}
+
+/************************ Notifications ************************/
 
 function sendNotification(notification) {
     return { type: SEND_NOTIFICATION, notification }
