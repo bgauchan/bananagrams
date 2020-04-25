@@ -112,8 +112,10 @@ const StyledSection = styled.section`
         font-size: 20px;
     }
 
-    button {
-		background: #ff7272;
+    button,
+    .go_home_btn {
+        background: #ff7272;
+        border: 2px solid #dc6767;
         border-radius: 10px;
         color: white;
         font-size: 20px;
@@ -124,6 +126,27 @@ const StyledSection = styled.section`
 
     button:disabled {
         background: #c5c3c3;
+        border: 2px solid lightgrey;
+    }
+
+    .go_home_btn {
+        display: flex;
+        align-times: center;
+        font-size: 18px;
+        margin: 0;
+        position: fixed;
+        left: 15px;
+        top: 15px;
+        text-decoration: none;
+    }
+
+    .go_home_btn:hover {
+        background: #ef6a6a;
+    }
+
+    .go_home_btn img {
+        margin-right: 10px;
+        width: 22px;
     }
 ` 
 
@@ -177,6 +200,11 @@ class WaitingRoom extends Component {
 
                 { !gameStarted && (
                     <div className="container">
+                        <a href="/" className="go_home_btn">
+                            <img src="https://image.flaticon.com/icons/svg/861/861151.svg" alt="go home" />
+                            <span>Go Home</span>
+                        </a>
+
                         <h1>Waiting For Players...</h1> 
 
                         { selectedPlayerName ?
