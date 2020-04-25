@@ -2,7 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import Game from './Game'
-import { handlePlayers, handleSelectPlayer, handleStartGame } from '../actions'
+import { 
+    handlePlayers, handleSelectPlayer, 
+    handleStartGame, listenToGamestackUpdates 
+} from '../actions'
 
 const StyledSection = styled.section`
     background: #f9db5c;
@@ -44,7 +47,7 @@ const StyledSection = styled.section`
     }
 
     .players li:hover {
-        border: 2px solid #562d18;
+        border: 2px solid #b56237;
         filter: drop-shadow(2px 4px 6px #562d18);
         transform: translateY(-6px);
     }
@@ -157,6 +160,7 @@ class WaitingRoom extends Component {
         // isPlaying: true,
     }
     componentDidMount() {  
+        this.props.dispatch(listenToGamestackUpdates())
         this.props.dispatch(handlePlayers()) 
     }
     startGame() {

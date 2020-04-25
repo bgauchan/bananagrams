@@ -12,16 +12,10 @@ export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
 export function handleUpdateLocalState(updates) {
     return (dispatch, getState) => {
         let prevLocalState = getState().localState
-        let updatedPersonalStack = prevLocalState.personalStack
-
-        if(updates && updates.players) {
-            let thisIsMe = updates.players.find((p) => p.playerID === prevLocalState.playerSelected)
-            updatedPersonalStack = thisIsMe.personalStack
-        }
     
         let localStateUpdates = {
             ...prevLocalState,
-            personalStack: updatedPersonalStack
+            ...updates
         }
         
         dispatch({ type: UPDATE_LOCAL_STATE, updates: localStateUpdates }) 

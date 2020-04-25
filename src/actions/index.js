@@ -117,9 +117,11 @@ export function handleSelectPlayer(playerID) {
 
 // Start Game
 
+export const START_GAME = 'START_GAME'
+
 export function handleStartGame() {
     return (dispatch, getState) => {   
-        let { syncState } = getState() 
+        let { syncState, localState } = getState() 
         let gameID = syncState.gameID
         let gameStack = [...syncState.gameStack]
         let players = [...syncState.players]
@@ -131,42 +133,81 @@ export function handleStartGame() {
 		} else if(players.length > 4) {
 			numOfPersonalTiles = 15
         }
+
+        // ----- lets divide up the tiles from game stack to players ------
         
-        let updatedPlayers = []
+        let updatedPlayers = [] 
+        let updatedPersonalStack = [] 
 
         players.forEach((p) => {
+            let personalStack = gameStack.splice(0, numOfPersonalTiles)
+            
+            // stack for the current player
+            if(p.playerID === localState.playerSelected) {
+                updatedPersonalStack = personalStack
+            }
+
+            // add id and stack to each player
             updatedPlayers.push({
                 playerID: p.playerID,
-                personalStack: gameStack.splice(0, numOfPersonalTiles)
+                personalStack
             })
         })
 
-        let initialState = {
+        // ----- now let's set up initial states for local and sync ------
+
+        let initialSyncState = {
             ...syncState,
             players: updatedPlayers,
-            gameStack
+            gameStack,
+            gameStarted: true
         }
 
-        db.ref('/game/' + gameID).set(initialState)
-        .then(() => {
-            dispatch(handleUpdateSyncState(initialState))
-            dispatch(handleUpdateLocalState(initialState))
-            // dispatch(handleStartGame())
+        let initialLocalState = {
+            ...localState,
+            personalStack: updatedPersonalStack,
+            isPlaying: true
+        }
 
-            // put a listener on gamestack so we can dispatch updates
-            // as soon as we detect any update
-            // settingsRef.on('value', function(snapshot) {
-            //     let { syncState } = getState()
-            //     let updates = snapshot.val()
-                
-            //     if(syncState.gameStarted) {
-            //         dispatch(handleUpdateSyncState({ ...updates, gameStarted: true }))
-            //     }
-            // });
+        db.ref('/game/' + gameID).set(initialSyncState)
+        .then(() => {
+            dispatch(handleUpdateSyncState(initialSyncState))
+            dispatch(handleUpdateLocalState(initialLocalState))
+            dispatch({ type: START_GAME, gameStarted: true })
         })
-        .catch((error) => console.error("Firebase: error adding document: ", error))    
+        .catch((error) => console.error("Firebase: error setting initial sync state: ", error))    
     }
 }
+
+//------------------ Gamestack updates ------------------//
+
+export const UPDATE_GAMESTACK = 'UPDATE_GAMESTACK'
+
+export function listenToGamestackUpdates() {
+    return (dispatch, getState) => {
+        let { syncState } = getState()
+        let gameID = syncState.gameID
+
+        // put a listener on gamestack so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/gameStack').on('value', (snapshot) => {
+            let gameStackUpdates = snapshot.val()
+            
+            if(syncState.gameStarted) {
+                let action = {
+                    type: UPDATE_GAMESTACK,
+                    updates: {
+                        ...syncState,
+                        ...gameStackUpdates
+                    }
+                }
+
+                dispatch(handleUpdateSyncState(action))
+            }
+        });
+    }
+}
+
 
 /************************ Notifications ************************/
 

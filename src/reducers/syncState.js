@@ -1,12 +1,11 @@
 import {
-    START_GAME,
     UPDATE_SYNC_STATE,
 } from '../actions/syncState'
 
 import { 
     SETUP_GAME_FROM_SERVER, SETUP_GAME, 
     ERROR_NO_GAME, CREATE_GAME, 
-    UPDATE_SELECTED_PLAYERS
+    UPDATE_SELECTED_PLAYERS, START_GAME,
 } from '../actions'
 
 const syncState = (state = {}, action)  => {    
