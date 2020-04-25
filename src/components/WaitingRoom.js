@@ -18,16 +18,18 @@ const StyledSection = styled.section`
 
     .players {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
+        flex-wrap: wrap;
         text-align: center;
-        width: 960px;
+        width: 80vw;
+        max-width: 1080px;
     }
 
     .players li {
         background: white;
         color: #562d18;
         cursor: pointer;
-        border: 2px solid #562d18;
+        border: 2px solid #f1e097;
         filter: grayscale(1);
         padding: 14px 10px 10px;
         border-radius: 10px;
@@ -35,11 +37,16 @@ const StyledSection = styled.section`
         display: flex;
         flex-direction: column;
         align-items: center;
+        flex: 0 0 115px;
+        margin: 10px;
         position: relative;
+        transition: transform 100ms linear;
     }
 
     .players li:hover {
+        border: 2px solid #562d18;
         filter: drop-shadow(2px 4px 6px #562d18);
+        transform: translateY(-6px);
     }
 
     .players li.active,
@@ -66,6 +73,7 @@ const StyledSection = styled.section`
     .players li.active:after {
         content: '';
         background-image: url(https://image.flaticon.com/icons/svg/575/575393.svg);
+        border: 2px solid #562d18;
         border-radius: 8px;
         height: 100%;
         position: absolute;
