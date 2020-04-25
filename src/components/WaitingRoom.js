@@ -187,11 +187,8 @@ class WaitingRoom extends Component {
         return classes
     }
     render() {
-        // let { gameStarted } = this.props.syncState	
-        // let { isPlaying } = this.props.localState
-
-        let gameStarted = this.state.gameStarted
-        let isPlaying = this.state.isPlaying
+        let { gameStarted } = this.props.syncState	
+        let { isPlaying } = this.props.localState
 
         let selectedPlayerName = this.state.selectedPlayer
         selectedPlayerName = selectedPlayerName.split('_').join(' ')
