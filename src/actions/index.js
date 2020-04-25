@@ -98,10 +98,10 @@ export function handleSelectPlayer(playerID) {
         // update db
         db.ref('/game/' + gameID + '/players').transaction((players) => {
             if(players) {
-                return [ ...players, playerID]                
+                return [ ...players, { playerID }]
             }
 
-            return [playerID]
+            return [{ playerID }]
         })
         .then(() => {
             dispatch({
@@ -113,6 +113,33 @@ export function handleSelectPlayer(playerID) {
     }
 }
 
+// Start Game
+
+export function handleStartGame() {
+    return (dispatch, getState) => {   
+        let { syncState } = getState() 
+        let gameStack = [...syncState.gameStack]
+        let players = [...syncState.players]
+
+        let numOfPersonalTiles = 21
+	
+		if(players.length > 6) {
+			numOfPersonalTiles = 11
+		} else if(players.length > 4) {
+			numOfPersonalTiles = 15
+        }
+        
+        let updatedPlayers = []
+
+        players.forEach((p) => {
+            updatedPlayers.push({
+                playerID: p.playerID,
+                personalStack: gameStack.splice(0, numOfPersonalTiles)
+            })
+        })
+    }
+}
+
 /************************ Notifications ************************/
 
 function sendNotification(notification) {
@@ -120,7 +147,6 @@ function sendNotification(notification) {
 }
 
 export function handleSendNotification(notification) {
-    debugger
     return (dispatch, getState) => {    
         let notificationID = Date.now()
         notification.id = notificationID

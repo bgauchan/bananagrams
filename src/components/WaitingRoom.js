@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-// import Game from './Game'
-import { handlePlayers, handleSelectPlayer } from '../actions'
+import Game from './Game'
+import { handlePlayers, handleSelectPlayer, handleStartGame } from '../actions'
 
 const StyledSection = styled.section`
     background: #f9db5c;
@@ -129,10 +129,15 @@ const StyledSection = styled.section`
 
 class WaitingRoom extends Component {    
     state = {
-        selectedPlayer: ""
+        selectedPlayer: "",
+        // gameStarted: true,
+        // isPlaying: true,
     }
     componentDidMount() {  
         this.props.dispatch(handlePlayers()) 
+    }
+    startGame() {
+        this.props.dispatch(handleStartGame())
     }
     selectPlayer(playerID) {
         if(!this.state.selectedPlayer) {
@@ -144,7 +149,7 @@ class WaitingRoom extends Component {
         let { players } = this.props.syncState	
         let classes = ''
 
-        if(players && players.includes(playerID)) {
+        if(players && players.find((p) => p.playerID === playerID)) {
             classes += 'selected '
         }
 
@@ -155,13 +160,20 @@ class WaitingRoom extends Component {
         return classes
     }
     render() {
-        let { gameStarted } = this.props.syncState	
+        // let { gameStarted } = this.props.syncState	
+        // let { isPlaying } = this.props.localState
+
+        let gameStarted = this.state.gameStarted
+        let isPlaying = this.state.isPlaying
+
         let selectedPlayerName = this.state.selectedPlayer
         selectedPlayerName = selectedPlayerName.split('_').join(' ')
         
         return (
             <StyledSection>
-                { gameStarted && <h1>Sorry, the game is already in progress!!</h1> }
+                { gameStarted && isPlaying && <Game /> }
+
+                { gameStarted && !isPlaying && <h1>Sorry, the game is already in progress!!</h1> }
 
                 { !gameStarted && (
                     <div className="container">
@@ -171,7 +183,6 @@ class WaitingRoom extends Component {
                             <h2>You picked: <span className="selected_player">{ selectedPlayerName }</span></h2> :
                             <h2>Pick a character</h2>
                         }
-                        
 
                         <ul className="players">
                             <li onClick={() => this.selectPlayer('creature')} 
@@ -216,7 +227,8 @@ class WaitingRoom extends Component {
                             </li>
                         </ul>
 
-                        <button disabled={ selectedPlayerName ? '' : 'disabled' }>
+                        <button disabled={ selectedPlayerName ? '' : 'disabled' }
+                                onClick={() => this.startGame()}>
                             SPLIT
                         </button>
                     </div>
