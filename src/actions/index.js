@@ -2,16 +2,9 @@
 import db from '../firebase'
 import { getShuffledtiles } from '../helpers'
 
-export const CREATE_GAME = 'CREATE_GAME'
 export const SETUP_GAME = 'SETUP_GAME'
 export const SETUP_GAME_FROM_SERVER = 'SETUP_GAME_FROM_SERVER'
 export const ERROR_NO_GAME = 'ERROR_NO_GAME'
-
-export const PLAYER_SELECTED = 'PLAYER_SELECTED'
-export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
-
-export const SEND_NOTIFICATION = 'SEND_NOTIFICATION'
-export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION'
 
 export function handleSetupGame() {
     return (dispatch, getState) => {
@@ -51,6 +44,8 @@ export function handleSetupGame() {
     }
 }
 
+export const CREATE_GAME = 'CREATE_GAME'
+
 export function handleCreateGame() {
     return (dispatch, getState) => {
         let { syncState } = getState()
@@ -74,6 +69,8 @@ export function handleCreateGame() {
     }
 }
 
+export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
+
 export function handlePlayers() { 
     return (dispatch, getState) => {
         let { syncState } = getState()
@@ -89,6 +86,8 @@ export function handlePlayers() {
         });
     }
 }
+
+export const PLAYER_SELECTED = 'PLAYER_SELECTED'
 
 export function handleSelectPlayer(playerID) {
     return (dispatch, getState) => {
@@ -146,6 +145,8 @@ function sendNotification(notification) {
     return { type: SEND_NOTIFICATION, notification }
 }
 
+export const SEND_NOTIFICATION = 'SEND_NOTIFICATION'
+
 export function handleSendNotification(notification) {
     return (dispatch, getState) => {    
         let notificationID = Date.now()
@@ -159,6 +160,8 @@ export function handleSendNotification(notification) {
         }, 4000);
     }
 }
+
+export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION'
 
 function removeNotification(id) {
     return { type: REMOVE_NOTIFICATION, id }
