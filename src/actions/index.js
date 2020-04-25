@@ -56,7 +56,8 @@ export function handleCreateGame() {
             type: CREATE_GAME, 
             syncState: {
                 ...syncState,
-                gameID: newGameID 
+                gameID: newGameID,
+                dateCreated: (new Date()).toString()
             }
         }
 
