@@ -1,9 +1,7 @@
 import db from '../firebase'
 import { handleSendNotification } from './index'
-import { updateLocalState, handleRemoveNewStatus } from './localState'
+import { handleUpdateLocalState, handleRemoveNewStatus } from './localState'
 
-export const INITIALIZE_SYNC_STATE = 'INITIALIZE_SYNC_STATE'
-export const UPDATE_SYNC_STATE = 'UPDATE_SYNC_STATE'
 export const START_GAME = 'START_GAME'
 export const DUMP_TILE = 'DUMP_TILE'
 
@@ -30,48 +28,20 @@ export function handleStartGame() {
     }
 }
 
-// function initializeSyncState(syncState) {
-//     return { type: INITIALIZE_SYNC_STATE, syncState }
-// }
-
-// export function handleInitializeSyncState(numOfPlayers, numOfPersonalTiles, numOfGameTiles) {
-//     // only save the syncState with firebase
-//     return (dispatch, getState) => {
-//         let initialState = {
-//             gameStarted: false,
-//             numOfPlayers,
-//             numOfPersonalTiles,
-//             numOfGameTiles,
-//             gameStack: getShuffledPieces(numOfGameTiles)
-//         }
-
-//         settingsRef.set(initialState)
-//         .then(() => {
-//             dispatch(initializeSyncState(initialState))
-//             dispatch(handleStartGame())
-
-//             // put a listener on settings ref so we can dispatch updates
-//             // as soon as we detect any update
-//             settingsRef.on('value', function(snapshot) {
-//                 let { syncState } = getState()
-//                 let updates = snapshot.val()
-                
-//                 if(syncState.gameStarted) {
-//                     dispatch(updateSyncState({ ...updates, gameStarted: true }))
-//                 }
-//             });
-//         })
-//         .catch((error) => console.error("Firebase: error adding document: ", error))    
-//     }
-// }
-
 function dumpTile(tile) {
     return { type: DUMP_TILE, tile }
 }
 
-// function updateSyncState(updates) {
-//     return { type: UPDATE_SYNC_STATE, updates }
-// }
+export const UPDATE_SYNC_STATE = 'UPDATE_SYNC_STATE'
+
+export function handleUpdateSyncState(updates) {
+    return (dispatch) => {
+        dispatch({
+            type: UPDATE_SYNC_STATE,
+            updates
+        })
+    }
+}
 
 function getPersonalStackAfterDump(personalStack) {		
     // let extraThreeTiles = getShuffledTiles(3)
@@ -142,7 +112,7 @@ export function handleDumpTile(updates) {
             }))
 
             dispatch(dumpTile(updates.tile))
-            dispatch(updateLocalState(localStateUpdates))
+            dispatch(handleUpdateLocalState(localStateUpdates))
 
             // remove new status from tiles in personal stack after 5s
             setTimeout(() => {

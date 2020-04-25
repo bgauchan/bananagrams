@@ -1,6 +1,8 @@
 
 import db from '../firebase'
 import { getShuffledtiles } from '../helpers'
+import { handleUpdateSyncState } from './syncState'
+import { handleUpdateLocalState } from './localState'
 
 export const SETUP_GAME = 'SETUP_GAME'
 export const SETUP_GAME_FROM_SERVER = 'SETUP_GAME_FROM_SERVER'
@@ -118,6 +120,7 @@ export function handleSelectPlayer(playerID) {
 export function handleStartGame() {
     return (dispatch, getState) => {   
         let { syncState } = getState() 
+        let gameID = syncState.gameID
         let gameStack = [...syncState.gameStack]
         let players = [...syncState.players]
 
@@ -137,6 +140,31 @@ export function handleStartGame() {
                 personalStack: gameStack.splice(0, numOfPersonalTiles)
             })
         })
+
+        let initialState = {
+            ...syncState,
+            players: updatedPlayers,
+            gameStack
+        }
+
+        db.ref('/game/' + gameID).set(initialState)
+        .then(() => {
+            dispatch(handleUpdateSyncState(initialState))
+            dispatch(handleUpdateLocalState(initialState))
+            // dispatch(handleStartGame())
+
+            // put a listener on gamestack so we can dispatch updates
+            // as soon as we detect any update
+            // settingsRef.on('value', function(snapshot) {
+            //     let { syncState } = getState()
+            //     let updates = snapshot.val()
+                
+            //     if(syncState.gameStarted) {
+            //         dispatch(handleUpdateSyncState({ ...updates, gameStarted: true }))
+            //     }
+            // });
+        })
+        .catch((error) => console.error("Firebase: error adding document: ", error))    
     }
 }
 

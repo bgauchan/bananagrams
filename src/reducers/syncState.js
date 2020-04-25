@@ -1,6 +1,5 @@
 import {
     START_GAME,
-    INITIALIZE_SYNC_STATE,
     UPDATE_SYNC_STATE,
 } from '../actions/syncState'
 
@@ -19,11 +18,6 @@ const syncState = (state = {}, action)  => {
             return {
                 ...state,
                 gameStarted: action.gameStarted
-            }
-        case INITIALIZE_SYNC_STATE:
-            return {
-                ...state,
-                ...action.syncState
             }
         case CREATE_GAME:
             return {

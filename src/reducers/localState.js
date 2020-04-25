@@ -1,6 +1,5 @@
 
 import { 
-    INITIALIZE_LOCAL_STATE, 
     UPDATE_LOCAL_STATE,
     REMOVE_NEW_STATUS
 } from '../actions/localState'
@@ -19,11 +18,6 @@ let defaultState =  {
 
 const localState = (state = defaultState, action)  => {
     switch (action.type) {
-        case INITIALIZE_LOCAL_STATE:
-            return {
-                ...state,
-                ...action.localState
-            }
         case UPDATE_LOCAL_STATE:
         case REMOVE_NEW_STATUS:
             return {

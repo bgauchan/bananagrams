@@ -1,34 +1,31 @@
 
 import { handleDumpTile } from './syncState'
 
-export const INITIALIZE_LOCAL_STATE = 'INITIALIZE_LOCAL_STATE'
-export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
 export const MOVE_TILE = 'MOVE_TILE'
-export const REMOVE_NEW_STATUS = 'REMOVE_NEW_STATUS'
-
-// function initializeLocalState(localState) {
-//     return { type: INITIALIZE_LOCAL_STATE, localState }
-// }
-
-// export function handleInitializeLocalState(numOfPersonalTiles) {
-//     return (dispatch, getState) => {
-//         let prevLocalState = getState().localState
-    
-//         let localState = {
-//             ...prevLocalState,
-//             personalStack: getShuffledPieces(numOfPersonalTiles)
-//         }
-        
-//         dispatch(initializeLocalState(localState)) 
-//     }
-// }
 
 function moveTile(tile) {
     return { type: MOVE_TILE, tile }
 }
 
-export function updateLocalState(updates) {
-    return { type: UPDATE_LOCAL_STATE, updates }
+export const UPDATE_LOCAL_STATE = 'UPDATE_LOCAL_STATE'
+
+export function handleUpdateLocalState(updates) {
+    return (dispatch, getState) => {
+        let prevLocalState = getState().localState
+        let updatedPersonalStack = prevLocalState.personalStack
+
+        if(updates && updates.players) {
+            let thisIsMe = updates.players.find((p) => p.playerID === prevLocalState.playerSelected)
+            updatedPersonalStack = thisIsMe.personalStack
+        }
+    
+        let localStateUpdates = {
+            ...prevLocalState,
+            personalStack: updatedPersonalStack
+        }
+        
+        dispatch({ type: UPDATE_LOCAL_STATE, updates: localStateUpdates }) 
+    }
 }
 
 function getUpdates(e, index, targetName, localState) {
@@ -79,10 +76,15 @@ export function handleDumpOrMoveTile(e, index, targetName) {
             dispatch(handleDumpTile(updates))
         } else {
             dispatch(moveTile(updates.tile))
-            dispatch(updateLocalState(updates.localState))
+            dispatch({
+                type: UPDATE_LOCAL_STATE,
+                updates: updates.localState
+            })
         }
     }
 }
+
+export const REMOVE_NEW_STATUS = 'REMOVE_NEW_STATUS'
 
 function removeNewStatus(updates) {
     return { type: REMOVE_NEW_STATUS, updates }
