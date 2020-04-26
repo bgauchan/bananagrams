@@ -96,8 +96,8 @@ export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
 
 export function handlePlayers() { 
     return (dispatch, getState) => {
-        let { syncState } = getState()
-        let gameID = syncState.gameID
+        let { localState } = getState()
+        let gameID = localState.gameID
 
         // put a listener on settings ref so we can dispatch updates
         // as soon as we detect any update
@@ -114,8 +114,8 @@ export const PLAYER_SELECTED = 'PLAYER_SELECTED'
 
 export function handleSelectPlayer(playerID) {
     return (dispatch, getState) => {
-        let { syncState } = getState()
-        let gameID = syncState.gameID
+        let { localState } = getState()
+        let gameID = localState.gameID
 
         // update db
         db.ref('/game/' + gameID + '/players').transaction((players) => {
@@ -207,24 +207,27 @@ export const UPDATE_GAMESTACK = 'UPDATE_GAMESTACK'
 
 export function listenToGamestackUpdates() {
     return (dispatch, getState) => {
-        let { syncState } = getState()
-        let gameID = syncState.gameID
-
+        let { localState } = getState()
+        let gameID = localState.gameID
+        
         // put a listener on gamestack so we can dispatch updates
         // as soon as we detect any update
         db.ref('/game/' + gameID + '/gameStack').on('value', (snapshot) => {
-            let gameStackUpdates = snapshot.val()
-            
+            let { syncState } = getState()
+
+            // if no changes, just return
+            if(syncState.gameStack.length === snapshot.val().length) return
+
             if(syncState.gameStarted) {
                 let action = {
                     type: UPDATE_GAMESTACK,
                     updates: {
                         ...syncState,
-                        ...gameStackUpdates
+                        gameStack: snapshot.val()
                     }
                 }
 
-                dispatch(handleUpdateSyncState(action))
+                dispatch(action)
             }
         });
     }
@@ -237,7 +240,8 @@ const SET_CACHE = 'SET_CACHE'
 function setLocalStateCache(localState) {
     return (dispatch, getState) => {
         let expiryDate = new Date()
-        expiryDate.setMinutes(expiryDate.getMinutes() + 1) // cache is only valid for 1 min
+        //expiryDate.setMinutes(expiryDate.getMinutes() + 1) // cache is only valid for 1 min
+        expiryDate.setMinutes(expiryDate.getMinutes() + 30) 
 
         localState.expiryTimestamp = expiryDate.getTime()
 

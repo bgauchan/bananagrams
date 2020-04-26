@@ -75,9 +75,10 @@ function getPersonalStackAfterDump(personalStack) {
 export function handleDumpTile(updates) {
     return (dispatch, getState) => {        
         let { syncState, localState } = getState()
+        let gameID = localState.gameID
 
         // only dump if the game stack has more than 3 tiles left
-        if(syncState.gameStack.length < 3) {
+        if(syncState.gameStack.length < 0) {
             // dispatch a notification here
             return
         }
@@ -93,22 +94,17 @@ export function handleDumpTile(updates) {
             dumpStack: [undefined]
         }
 
-        let updatedGameStack = [...syncState.gameStack]
-        // user dumps 1 back in, game stack gives 3 out
-        // so the deduction from stack is 2 tiles
-        updatedGameStack.splice(0, 2) 
-        
         // update db
-        settingsRef.transaction(function(prevSettings) {
-            return {
-                ...prevSettings,
-                gameStack: updatedGameStack
-            }
+        db.ref('/game/' + gameID + '/gameStack').transaction((prevGameStack) => {
+            // user dumps 1 back in, game stack gives 3 out
+            // so the deduction from stack is 2 tiles
+            prevGameStack.splice(0, 2)
+            return prevGameStack
         })
         .then(() => {
             dispatch(handleSendNotification({
                 type: 'dumpTile',
-                text: 'Player 2 just dumped a tile'
+                text: `${localState.playerSelected} dumped a tile!`
             }))
 
             dispatch(dumpTile(updates.tile))

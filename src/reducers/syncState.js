@@ -6,6 +6,7 @@ import {
     SETUP_GAME_FROM_SERVER, SETUP_GAME, 
     ERROR_NO_GAME, CREATE_GAME, 
     UPDATE_SELECTED_PLAYERS, START_GAME,
+    UPDATE_GAMESTACK
 } from '../actions'
 
 const syncState = (state = {}, action)  => {    
@@ -21,6 +22,7 @@ const syncState = (state = {}, action)  => {
         case CREATE_GAME:
             return action.updates.syncState
         case UPDATE_SYNC_STATE:
+        case UPDATE_GAMESTACK:
             return {
                 ...state,
                 ...action.updates

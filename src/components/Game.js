@@ -15,7 +15,7 @@ const StyledApp = styled.div`
 const StyledSidebar = styled.aside`
 	background: #f9db5c;
 	border-right: 1px solid #e6b242;
-	color: #e6b242;
+	color: #cd9d35;
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
@@ -200,7 +200,7 @@ class Game extends Component {
 				<StyledSidebar>
 					<div className="logo">
 						<img alt='logo' src='https://image.flaticon.com/icons/svg/575/575393.svg' />
-						<h1>Plantaingrams</h1>
+						<h1>Bananagrams</h1>
 					</div>
 					<StyledBoard>
 						{ localState.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
