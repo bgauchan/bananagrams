@@ -10,7 +10,6 @@ import {
 
 const syncState = (state = {}, action)  => {    
     switch (action.type) {
-        case SETUP_GAME_FROM_SERVER:
         case SETUP_GAME:
             return action.syncState
         case START_GAME:
@@ -18,11 +17,9 @@ const syncState = (state = {}, action)  => {
                 ...state,
                 gameStarted: action.gameStarted
             }
+        case SETUP_GAME_FROM_SERVER:
         case CREATE_GAME:
-            return {
-                ...state,
-                ...action.syncState
-            }
+            return action.updates.syncState
         case UPDATE_SYNC_STATE:
             return {
                 ...state,

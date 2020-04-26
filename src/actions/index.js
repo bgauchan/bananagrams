@@ -9,7 +9,7 @@ export const SETUP_GAME_FROM_SERVER = 'SETUP_GAME_FROM_SERVER'
 export const ERROR_NO_GAME = 'ERROR_NO_GAME'
 
 export function handleSetupGame() {
-    return (dispatch, getState) => {
+    return (dispatch) => {
         let pathName = window.location.pathname
         
         // if game ID is in url, check if it exists in db
@@ -31,7 +31,10 @@ export function handleSetupGame() {
                 // if game already exists load it from db
                 dispatch({
                     type: SETUP_GAME_FROM_SERVER,
-                    syncState: snapshot.val()
+                    updates: {
+                        localState: { gameID },
+                        syncState: snapshot.val()
+                    }
                 })
             })
         } else {
@@ -50,21 +53,27 @@ export const CREATE_GAME = 'CREATE_GAME'
 
 export function handleCreateGame() {
     return (dispatch, getState) => {
-        let { syncState } = getState()
+        let { localState, syncState } = getState()
 
         // create a new game ID
         let newGameID = db.ref('game').push().key
+
         let action = { 
             type: CREATE_GAME, 
-            syncState: {
-                ...syncState,
-                gameID: newGameID,
-                dateCreated: (new Date()).toString()
+            updates: {
+                localState: { 
+                    ...localState, 
+                    gameID: newGameID, 
+                },
+                syncState: { 
+                    ...syncState,
+                    dateCreated: (new Date()).toString() 
+                }
             }
         }
 
         // save game to db and then change the url
-        db.ref('/game/' + newGameID).set(action.syncState)
+        db.ref('/game/' + newGameID).set(action.updates.syncState)
         .then(() => {
             window.history.pushState(null, '', `/game/${newGameID}`);   
             dispatch(action)
@@ -208,8 +217,7 @@ export function listenToGamestackUpdates() {
     }
 }
 
-
-/************************ Notifications ************************/
+//------------------ Notifications ------------------//
 
 function sendNotification(notification) {
     return { type: SEND_NOTIFICATION, notification }

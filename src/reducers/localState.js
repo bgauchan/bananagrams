@@ -5,7 +5,8 @@ import {
 } from '../actions/localState'
 
 import {
-    PLAYER_SELECTED
+    PLAYER_SELECTED, CREATE_GAME,
+    SETUP_GAME_FROM_SERVER 
 } from '../actions'
 
 let defaultState =  {
@@ -15,9 +16,15 @@ let defaultState =  {
     dumpStack: [...Array(1)]
 }
 
-
 const localState = (state = defaultState, action)  => {
     switch (action.type) {
+        case CREATE_GAME: 
+            return action.updates.localState
+        case SETUP_GAME_FROM_SERVER:
+            return {
+                ...state,
+                ...action.updates.localState
+            }
         case UPDATE_LOCAL_STATE:
         case REMOVE_NEW_STATUS:
             return {

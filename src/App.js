@@ -32,7 +32,7 @@ class App extends Component {
         this.props.dispatch(handleSetupGame())
     }
     render() {
-		let { notifications, syncState } = this.props
+		let { notifications, syncState, localState } = this.props
 		
         return (
 			<div>
@@ -46,7 +46,7 @@ class App extends Component {
 
 				{ syncState.errorMessage ? 
 					<h1> { syncState.errorMessage } </h1> : 
-					syncState.gameID ? <WaitingRoom /> : <StartScreen  />
+					localState.gameID ? <WaitingRoom /> : <StartScreen  />
 				}
 			</div>
 		)
@@ -55,7 +55,8 @@ class App extends Component {
 
 const mapStateToProps = (state, ownProps) => ({
 	notifications: state.notifications,
-	syncState: state.syncState
+	syncState: state.syncState,
+	localState: state.localState
 })
 
 export default connect(
