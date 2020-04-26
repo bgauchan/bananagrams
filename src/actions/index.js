@@ -27,12 +27,23 @@ export function handleSetupGame() {
 
                     return
                 }
+
+                let updatedLocalState = { gameID }
+                let localStateCache = JSON.parse(localStorage.getItem("localStateCache"))
+                let cacheHasNotExpired = localStateCache.expiryTimestamp > Date.now()
+                
+                if(cacheHasNotExpired) {
+                    updatedLocalState = {
+                        ...localStateCache,
+                        gameID
+                    }
+                }
         
                 // if game already exists load it from db
                 dispatch({
                     type: SETUP_GAME_FROM_SERVER,
                     updates: {
-                        localState: { gameID },
+                        localState: updatedLocalState,
                         syncState: snapshot.val()
                     }
                 })
@@ -131,7 +142,7 @@ export const START_GAME = 'START_GAME'
 export function handleStartGame() {
     return (dispatch, getState) => {   
         let { syncState, localState } = getState() 
-        let gameID = syncState.gameID
+        let gameID = localState.gameID
         let gameStack = [...syncState.gameStack]
         let players = [...syncState.players]
 
@@ -182,6 +193,8 @@ export function handleStartGame() {
         .then(() => {
             dispatch(handleUpdateSyncState(initialSyncState))
             dispatch(handleUpdateLocalState(initialLocalState))
+            dispatch(setLocalStateCache(initialLocalState))
+
             dispatch({ type: START_GAME, gameStarted: true })
         })
         .catch((error) => console.error("Firebase: error setting initial sync state: ", error))    
@@ -214,6 +227,22 @@ export function listenToGamestackUpdates() {
                 dispatch(handleUpdateSyncState(action))
             }
         });
+    }
+}
+
+//------------------ Set and update cache ------------------//
+
+const SET_CACHE = 'SET_CACHE'
+
+function setLocalStateCache(localState) {
+    return (dispatch, getState) => {
+        let expiryDate = new Date()
+        expiryDate.setMinutes(expiryDate.getMinutes() + 1) // cache is only valid for 1 min
+
+        localState.expiryTimestamp = expiryDate.getTime()
+
+        localStorage.setItem("localStateCache", JSON.stringify(localState));
+        dispatch({ type: SET_CACHE, localState })
     }
 }
 

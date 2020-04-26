@@ -74,7 +74,7 @@ const StyledGameArea = styled.main`
 const StyledBoard = styled.ul`
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
 	list-style-type: none;
 

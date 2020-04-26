@@ -155,9 +155,7 @@ const StyledSection = styled.section`
 
 class WaitingRoom extends Component {    
     state = {
-        selectedPlayer: "",
-        // gameStarted: true,
-        // isPlaying: true,
+        selectedPlayer: ""
     }
     componentDidMount() {  
         this.props.dispatch(listenToGamestackUpdates())
