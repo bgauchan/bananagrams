@@ -1,5 +1,5 @@
 
-export function getShuffledtiles(count) {
+export function getShuffledTiles(count) {
     const tiles = [
         'J', 'J', 'K', 'K', 'Q', 'Q', 'X', 'X', 'Z', 'Z',
         'B', 'B', 'B', 'C', 'C', 'C', 'F', 'F', 'F',
@@ -19,8 +19,13 @@ export function getShuffledtiles(count) {
     ]
 
     let shuffledTiles = []
+    let numOfTiles = tiles.length
 
-    for(let i = 0; i < tiles.length; i++) {
+    if(count) {
+        numOfTiles = count
+    }
+
+    for(let i = 0; i < numOfTiles; i++) {
         let randomIndex = Math.floor(Math.random() * 143) + 1
 
         shuffledTiles.push({

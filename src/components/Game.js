@@ -74,9 +74,10 @@ const StyledGameArea = styled.main`
 const StyledBoard = styled.ul`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
 	list-style-type: none;
+	padding: 0 25px;
 
     li {
         border: 1px dotted #e6b242;

@@ -1,6 +1,6 @@
 
 import db from '../firebase'
-import { getShuffledtiles } from '../helpers'
+import { getShuffledTiles } from '../helpers'
 import { handleUpdateSyncState } from './syncState'
 import { handleUpdateLocalState } from './localState'
 
@@ -52,7 +52,7 @@ export function handleSetupGame() {
             // if no game ID in url, setup from local
             let syncState = {
                 gameStarted: false,
-                gameStack: getShuffledtiles()
+                gameStack: getShuffledTiles()
             }
         
             dispatch({ type: SETUP_GAME, syncState })

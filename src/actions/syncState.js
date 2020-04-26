@@ -1,6 +1,7 @@
 import db from '../firebase'
 import { handleSendNotification } from './index'
 import { handleUpdateLocalState, handleRemoveNewStatus } from './localState'
+import { getShuffledTiles } from '../helpers'
 
 export const START_GAME = 'START_GAME'
 export const DUMP_TILE = 'DUMP_TILE'
@@ -44,8 +45,7 @@ export function handleUpdateSyncState(updates) {
 }
 
 function getPersonalStackAfterDump(personalStack) {		
-    // let extraThreeTiles = getShuffledTiles(3)
-    let extraThreeTiles = []
+    let extraThreeTiles = getShuffledTiles(3)
 
     let updatedStack = personalStack.map((tile, index) => {
         // if there are empty slots, fill those up first
