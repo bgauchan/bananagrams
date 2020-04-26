@@ -46,10 +46,10 @@ export function handleUpdateSyncState(updates) {
 
 function getPersonalStackAfterDump(personalStack) {		
     let extraThreeTiles = getShuffledTiles(3)
-
+    
     let updatedStack = personalStack.map((tile, index) => {
         // if there are empty slots, fill those up first
-        if(tile === undefined && extraThreeTiles.length > 0) {
+        if(tile === null && extraThreeTiles.length > 0) {
             let newTile = extraThreeTiles.shift() // take one of the extra tiles
             newTile.order = index
             newTile.isNew = true
