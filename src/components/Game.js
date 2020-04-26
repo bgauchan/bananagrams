@@ -9,6 +9,7 @@ import {
 const StyledApp = styled.div`
 	background: #fbf6ef;
 	display: flex;
+	width: 100vw;
 `
 
 const StyledSidebar = styled.aside`
@@ -76,7 +77,6 @@ const StyledBoard = styled.ul`
     justify-content: flex-start;
     flex-wrap: wrap;
 	list-style-type: none;
-	padding: 0 25px;
 
     li {
         border: 1px dotted #e6b242;
