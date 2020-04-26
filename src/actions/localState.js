@@ -1,5 +1,6 @@
 
 import { handleDumpTile } from './syncState'
+import { cacheLocalState } from './index'
 
 export const MOVE_TILE = 'MOVE_TILE'
 
@@ -18,7 +19,8 @@ export function handleUpdateLocalState(updates) {
             ...updates
         }
         
-        dispatch({ type: UPDATE_LOCAL_STATE, updates: localStateUpdates }) 
+        dispatch({ type: UPDATE_LOCAL_STATE, updates: localStateUpdates })      
+        dispatch(cacheLocalState())
     }
 }
 
@@ -73,7 +75,9 @@ export function handleDumpOrMoveTile(e, index, targetName) {
             dispatch({
                 type: UPDATE_LOCAL_STATE,
                 updates: updates.localState
-            })
+            })          
+            
+            dispatch(cacheLocalState())
         }
     }
 }
@@ -98,6 +102,7 @@ export function handleRemoveNewStatus() {
             solvedStack: updatedSolvedStack
         }
 
-        dispatch(removeNewStatus(update))
+        dispatch(removeNewStatus(update))            
+        dispatch(cacheLocalState())
     }
 }

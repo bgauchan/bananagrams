@@ -193,7 +193,6 @@ export function handleStartGame() {
         .then(() => {
             dispatch(handleUpdateSyncState(initialSyncState))
             dispatch(handleUpdateLocalState(initialLocalState))
-            dispatch(setLocalStateCache(initialLocalState))
 
             dispatch({ type: START_GAME, gameStarted: true })
         })
@@ -237,8 +236,9 @@ export function listenToGamestackUpdates() {
 
 const SET_CACHE = 'SET_CACHE'
 
-function setLocalStateCache(localState) {
+export function cacheLocalState() {
     return (dispatch, getState) => {
+        let { localState } = getState()
         let expiryDate = new Date()
         //expiryDate.setMinutes(expiryDate.getMinutes() + 1) // cache is only valid for 1 min
         expiryDate.setMinutes(expiryDate.getMinutes() + 30) 
