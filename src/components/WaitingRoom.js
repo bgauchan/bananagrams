@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Game from './Game'
 import { 
     handlePlayers, handleSelectPlayer, 
-    handleStartGame, listenToGamestackUpdates 
+    handleStartGame, handleSetUpListeners 
 } from '../actions'
 
 const StyledSection = styled.section`
@@ -158,7 +158,7 @@ class WaitingRoom extends Component {
         selectedPlayer: ""
     }
     componentDidMount() {  
-        this.props.dispatch(listenToGamestackUpdates())
+        this.props.dispatch(handleSetUpListeners())
         this.props.dispatch(handlePlayers()) 
     }
     startGame() {

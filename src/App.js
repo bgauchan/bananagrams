@@ -39,7 +39,7 @@ class App extends Component {
 				{ notifications.length > 0 && (
 					<StyledNotificationsList>
 						{ notifications.map(notif => (
-							<Notification key={notif.id} text={notif.text}></Notification>
+							<Notification key={notif.date} text={notif.text}></Notification>
 						))}
 					</StyledNotificationsList>
 				)}
@@ -53,11 +53,18 @@ class App extends Component {
     }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-	notifications: state.notifications,
-	syncState: state.syncState,
-	localState: state.localState
-})
+const mapStateToProps = (state, ownProps) => {
+	let notifications = state.syncState.notifications
+
+	// only show notifications that are not older than 30 seconds
+	let notificationsToShow =  notifications ? notifications.filter((n) => (Date.now() - n.date) < 30000) : []
+
+	return {
+		notifications: notificationsToShow,
+		syncState: state.syncState,
+		localState: state.localState
+	}
+}
 
 export default connect(
 	mapStateToProps

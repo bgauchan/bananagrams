@@ -6,7 +6,8 @@ import {
     SETUP_GAME_FROM_SERVER, SETUP_GAME, 
     ERROR_NO_GAME, CREATE_GAME, 
     UPDATE_SELECTED_PLAYERS, START_GAME,
-    UPDATE_GAMESTACK
+    UPDATE_GAMESTACK,
+    SEND_NOTIFICATION, REMOVE_NOTIFICATION
 } from '../actions'
 
 const syncState = (state = {}, action)  => {    
@@ -37,6 +38,18 @@ const syncState = (state = {}, action)  => {
                 ...state,
                 players: action.players
             }
+        case SEND_NOTIFICATION:
+            return {
+                ...state,
+                notifications: state.notifications ? [...state.notifications, action.notification] : [action.notification]
+            } 
+        case REMOVE_NOTIFICATION:
+            let remainingNotifications = state.notifications.filter(n => n.date !== action.notificationDate) 
+            
+            return {
+                ...state,
+                notifications: remainingNotifications
+            }      
         default:
            return state
     }

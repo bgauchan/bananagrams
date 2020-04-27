@@ -180,7 +180,8 @@ export function handleStartGame() {
             ...syncState,
             players: updatedPlayers,
             gameStack,
-            gameStarted: true
+            gameStarted: true,
+            notifications: []
         }
 
         let initialLocalState = {
@@ -204,11 +205,30 @@ export function handleStartGame() {
 
 export const UPDATE_GAMESTACK = 'UPDATE_GAMESTACK'
 
-export function listenToGamestackUpdates() {
+export function handleSetUpListeners() {
     return (dispatch, getState) => {
         let { localState } = getState()
         let gameID = localState.gameID
-        
+
+        listenToNotifications(gameID)
+        listenToGamestackUpdates(gameID)
+    }
+}
+
+function listenToNotifications(gameID) {
+    return (dispatch, getState) => {
+        // put a listener on gamestack so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/notifications').on('value', (snapshot) => {
+            // let { syncState, notifications } = getState()
+
+            console.log('notification snapshot =>', snapshot.val())
+        })
+    }
+}
+
+function listenToGamestackUpdates(gameID) {
+    return (dispatch, getState) => {
         // put a listener on gamestack so we can dispatch updates
         // as soon as we detect any update
         db.ref('/game/' + gameID + '/gameStack').on('value', (snapshot) => {
@@ -228,7 +248,33 @@ export function listenToGamestackUpdates() {
 
                 dispatch(action)
             }
-        });
+        })
+    }
+}
+
+//------------------ Peel tile ------------------//
+
+export const PEEL_TILE = 'PEEL_TILE'
+
+export function handlePeelTile() {
+    return (dispatch, getState) => {
+        let { localState, syncState } = getState()
+        let gameID = localState.gameID
+        let numOfPlayers = syncState.players.length
+
+        // update db
+        db.ref('/game/' + gameID + '/gamestack').transaction((prevGameStack) => {
+            // give each player a tile, which means we should remove
+            // tiles equal to the number of players
+            prevGameStack.splice(0, numOfPlayers)
+            return prevGameStack
+        })
+        .then(() => {
+            dispatch({
+                type: PEEL_TILE,
+            })
+        })
+        .catch((error) => console.error("Firebase: error adding document: ", error))  
     }
 }
 
@@ -260,10 +306,28 @@ export const SEND_NOTIFICATION = 'SEND_NOTIFICATION'
 
 export function handleSendNotification(notification) {
     return (dispatch, getState) => {    
+        let { localState } = getState()
         let notificationID = Date.now()
-        notification.id = notificationID
+        notification.date = notificationID
 
-        dispatch(sendNotification(notification))
+        db.ref('/game/' + localState.gameID + '/notifications').transaction((prevNotifications) => {
+            let updatedNotifications = []
+            
+            if(prevNotifications === null) {
+                updatedNotifications = [notification]
+            } else {
+                // remove any notifications that have been there for more than 30 seconds
+                updatedNotifications = prevNotifications.filter((n) => (Date.now() - n.date) < 30000)
+                updatedNotifications.push(notification)
+            }
+
+            return updatedNotifications
+        })
+        .then(() => {
+            dispatch(sendNotification(notification))
+        })
+        .catch((error) => console.error("Firebase: error setting initial sync state: ", error))  
+
 
         // remove notification after 4 seconds
         setTimeout(() => {
@@ -275,5 +339,5 @@ export function handleSendNotification(notification) {
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION'
 
 function removeNotification(id) {
-    return { type: REMOVE_NOTIFICATION, id }
+    return { type: REMOVE_NOTIFICATION, notificationDate: id }
 }
