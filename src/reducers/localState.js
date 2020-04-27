@@ -12,7 +12,7 @@ import {
 let defaultState =  {
     isPlaying: false,
     personalStack: [],
-    solvedStack: [...Array(360)],
+    solvedStack: [...Array(440)],
     dumpStack: [...Array(1)]
 }
 

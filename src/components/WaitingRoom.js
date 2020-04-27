@@ -128,8 +128,8 @@ const StyledSection = styled.section`
     }
 
     button:disabled {
-        background: #c5c3c3;
-        border: 2px solid lightgrey;
+        filter: grayscale(1);
+        pointer-events: none;
     }
 
     .go_home_btn {

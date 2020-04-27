@@ -5,27 +5,36 @@ const StyledButtonsArea = styled.section`
     background: white;
     border: 1px solid #e6b242;
     border-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    position: absolute;
-    bottom: 25px;
-    right: 25px;
-    padding: 10px 12px 10px 16px;
+    position: fixed;
+    bottom: 0;
+    right: calc(50% - 336px);
+    padding: 18px 12px 20px 16px;
+    width: 380px;
 
     h4 {
         margin: 0;
     }
     
     .highlight {
-        color: orange;
+        color: #03a9f4;
         font-size: 22px;
-        margin: 0 20px 0 5px;
+        margin: 0 0 0 5px;
         position: relative;
         top: 1px;
     }
 
-	button {
+    .buttons {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+
+	.buttons button {
 		background: #ff7272;
         border-radius: 10px;
         color: white;
@@ -36,16 +45,27 @@ const StyledButtonsArea = styled.section`
 		justify-content: center;
 		height: 40px;
         width: auto;
+        margin: 20px 0 0;
         padding: 0 25px;
     }
 
     button:hover {
         background: #f75d5d;
     }
+
+    button.bananagrams_btn {
+        background: #f9db5b;
+        border: 2px solid #e6b242;
+        color: #a9802a;
+    }
+
+    button.bananagrams_btn:hover {
+        background: #ffe46f;
+    }
     
     img {
-        margin-right: 5px;
-        width: 30px;
+        margin-right: 10px;
+        width: 28px;
     }
 
     img.winner {
@@ -58,8 +78,8 @@ class GameButtons extends Component {
     render() {
         // hide peel button and show plantaingrams button if the user's
         // personal stack is empty
-        let hidePeelButton = this.props.personalStack.every(t => t === undefined)
-
+        let enableButtons = this.props.personalStack.every(t => t === undefined || t === null)
+        
         return (
             <StyledButtonsArea>
                 <h4>
@@ -69,21 +89,17 @@ class GameButtons extends Component {
                     </span>
                 </h4>
 
-                { !hidePeelButton && ( 
-                    <button>
+                <div className="buttons">
+                    <button className="peel_btn" disabled={!enableButtons}>
                         <img alt="peel" src="https://image.flaticon.com/icons/svg/1012/1012787.svg" />
-                        <span>PEEL</span>
+                        <span>Peel</span>
                     </button>
-                )}
-
-                { hidePeelButton && ( 
-                    <button>
+                    <button className="bananagrams_btn" disabled={!enableButtons}>
                         <img alt="peel" className="winner"
                             src="https://image.flaticon.com/icons/svg/2293/2293014.svg" />
-                        <span>PLATAINGRAMS!!</span>
+                        <span>Bananagrams!!</span>
                     </button>
-                )}
-                
+                </div>
             </StyledButtonsArea>
           );
     }

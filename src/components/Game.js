@@ -67,7 +67,7 @@ const StyledSidebar = styled.aside`
 const StyledGameArea = styled.main`
 	display: flex;
 	height: 100vh;
-	padding: 40px;
+	padding: 35px 0 40px 15px;
 	overflow: scroll;
 `
 
@@ -130,7 +130,7 @@ const StyledBoard = styled.ul`
 ` 
 const StyledGameBoard = styled(StyledBoard)`
 	justify-content: left;
-	min-width: 1940px;
+	min-width: 1750px;
 
 	li {
         border: 1px dotted lightgrey;
@@ -157,7 +157,7 @@ class Game extends Component {
 	getClassNames(index, piece) {
 		let names = ''
 
-		if(index === 194) {
+		if(index === 237) {
 			names += 'center_tile '
 		}
 
