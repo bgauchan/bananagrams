@@ -209,20 +209,33 @@ export function handleSetUpListeners() {
     return (dispatch, getState) => {
         let { localState } = getState()
         let gameID = localState.gameID
-
-        listenToNotifications(gameID)
-        listenToGamestackUpdates(gameID)
+        
+        dispatch(listenToNotifications(gameID))
+        dispatch(listenToGamestackUpdates(gameID))
     }
 }
 
 function listenToNotifications(gameID) {
     return (dispatch, getState) => {
-        // put a listener on gamestack so we can dispatch updates
+        // put a listener on notifications so we can dispatch updates
         // as soon as we detect any update
         db.ref('/game/' + gameID + '/notifications').on('value', (snapshot) => {
-            // let { syncState, notifications } = getState()
+            let { syncState } = getState()
+            let notifications = snapshot.val()
 
-            console.log('notification snapshot =>', snapshot.val())
+            // only show notifications that are not older than 30 seconds
+            let notificationsToShow =  notifications ? notifications.filter((n) => (Date.now() - n.date) < 30000) : []  
+
+            if(syncState.gameStarted && notificationsToShow.length > 0) {                
+                notificationsToShow.forEach(notification => {
+                    dispatch(sendNotification(notification))
+    
+                    // remove notification after 4 seconds
+                    setTimeout(() => {
+                        dispatch(removeNotification(notification.date))
+                    }, 4000);
+                })
+            }
         })
     }
 }
@@ -323,21 +336,16 @@ export function handleSendNotification(notification) {
 
             return updatedNotifications
         })
-        .then(() => {
-            dispatch(sendNotification(notification))
-        })
         .catch((error) => console.error("Firebase: error setting initial sync state: ", error))  
-
-
-        // remove notification after 4 seconds
-        setTimeout(() => {
-            dispatch(removeNotification(notificationID))
-        }, 4000);
     }
 }
 
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION'
 
-function removeNotification(id) {
-    return { type: REMOVE_NOTIFICATION, notificationDate: id }
+export function removeNotification(date) {
+    return (dispatch, getState) => {   
+        let { syncState } = getState() 
+        let remainingNotifications = syncState.notifications.filter(n => n.date !== date) 
+        dispatch({ type: REMOVE_NOTIFICATION, notifications: remainingNotifications })
+    }
 }

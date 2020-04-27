@@ -44,12 +44,10 @@ const syncState = (state = {}, action)  => {
                 notifications: state.notifications ? [...state.notifications, action.notification] : [action.notification]
             } 
         case REMOVE_NOTIFICATION:
-            let remainingNotifications = state.notifications.filter(n => n.date !== action.notificationDate) 
-            
             return {
                 ...state,
-                notifications: remainingNotifications
-            }      
+                notifications: action.notifications
+            }
         default:
            return state
     }
