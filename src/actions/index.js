@@ -273,19 +273,7 @@ function listenToGamestackUpdates(gameID) {
         // put a listener on gamestack so we can dispatch updates
         // as soon as we detect any update
         db.ref('/game/' + gameID + '/gameStack').on('value', (snapshot) => {
-            let { syncState } = getState()
-
-            if(syncState.gameStarted) {
-                let action = {
-                    type: UPDATE_GAMESTACK,
-                    updates: {
-                        ...syncState,
-                        gameStack: snapshot.val()
-                    }
-                }
-
-                dispatch(action)
-            }
+            dispatch(handleUpdateSyncState({ gameStack: snapshot.val() }))
         })
     }
 }
