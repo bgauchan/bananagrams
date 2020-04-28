@@ -98,18 +98,12 @@ export function handleDumpTile(updates) {
         db.ref(gameRef).transaction((prevGameStack) => {
             // user dumps 1 back in, game stack gives 3 out
             // so the deduction from stack is 2 tiles
-            if(prevGameStack) {
-                prevGameStack.splice(0, 2)
-            } else {
-                prevGameStack = []
-            }
-
-            return prevGameStack
+            return prevGameStack ? prevGameStack.splice(0, 2) : []
         })
         .then(() => {
             dispatch(handleSendNotification({
                 type: 'dump',
-                text: `${localState.playerSelected} dumped a tile!`
+                text: `${localState.selectedPlayer} dumped a tile!`
             }))
 
             dispatch(dumpTile(updates.tile))

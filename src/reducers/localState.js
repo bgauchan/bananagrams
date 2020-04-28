@@ -27,14 +27,10 @@ const localState = (state = defaultState, action)  => {
             }
         case UPDATE_LOCAL_STATE:
         case REMOVE_NEW_STATUS:
-            return {
-                ...state,
-                ...action.updates
-            }
         case PLAYER_SELECTED:
             return {
                 ...state,
-                playerSelected: action.playerID
+                ...action.updates
             }
         default:
            return state

@@ -30,7 +30,7 @@ export function handleSetupGame() {
 
                 let updatedLocalState = { gameID }
                 let localStateCache = JSON.parse(localStorage.getItem("localStateCache"))
-                let cacheHasNotExpired = localStateCache.expiryTimestamp > Date.now()
+                let cacheHasNotExpired = localStateCache ? localStateCache.expiryTimestamp > Date.now() : false
                 
                 if(cacheHasNotExpired) {
                     updatedLocalState = {
@@ -92,24 +92,6 @@ export function handleCreateGame() {
     }
 }
 
-export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
-
-export function handlePlayers() { 
-    return (dispatch, getState) => {
-        let { localState } = getState()
-        let gameID = localState.gameID
-
-        // put a listener on settings ref so we can dispatch updates
-        // as soon as we detect any update
-        db.ref('/game/' + gameID + '/players').on('value', function(snapshot) {
-            dispatch({
-                type: UPDATE_SELECTED_PLAYERS,
-                players: snapshot.val()
-            })
-        });
-    }
-}
-
 export const PLAYER_SELECTED = 'PLAYER_SELECTED'
 
 export function handleSelectPlayer(playerID) {
@@ -128,7 +110,10 @@ export function handleSelectPlayer(playerID) {
         .then(() => {
             dispatch({
                 type: PLAYER_SELECTED,
-                playerID: playerID
+                updates: {
+                    selectedPlayer: playerID,
+                    isPlaying: true
+                }
             })
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))    
@@ -163,7 +148,7 @@ export function handleStartGame() {
             let personalStack = gameStack.splice(0, numOfPersonalTiles)
             
             // stack for the current player
-            if(p.playerID === localState.playerSelected) {
+            if(p.playerID === localState.selectedPlayer) {
                 updatedPersonalStack = personalStack
             }
 
@@ -201,17 +186,60 @@ export function handleStartGame() {
     }
 }
 
-//------------------ Gamestack updates ------------------//
+//------------------ Listeners ------------------//
 
 export const UPDATE_GAMESTACK = 'UPDATE_GAMESTACK'
+export const UPDATE_SELECTED_PLAYERS = 'UPDATE_SELECTED_PLAYERS'
 
 export function handleSetUpListeners() {
     return (dispatch, getState) => {
         let { localState } = getState()
         let gameID = localState.gameID
-        
+
+        dispatch(listenToPlayersUpdates(gameID))
+        dispatch(listenToGameStarted(gameID))
         dispatch(listenToNotifications(gameID))
         dispatch(listenToGamestackUpdates(gameID))
+    }
+}
+
+export function listenToPlayersUpdates(gameID) { 
+    return (dispatch, getState) => {
+        // put a listener on settings ref so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/players').on('value', function(snapshot) {
+            let players = snapshot.val()
+            let { localState } = getState()
+
+            if(!players) return
+
+            dispatch({
+                type: UPDATE_SELECTED_PLAYERS,
+                players
+            })
+
+            let personalStack = [] 
+
+            players.forEach((p) => {
+                // stack for the current player
+                if(p.playerID === localState.selectedPlayer) {
+                    personalStack = p.personalStack
+                }
+            })
+
+            dispatch(handleUpdateLocalState({personalStack}))
+        });
+    }
+}
+
+function listenToGameStarted(gameID) {
+    return (dispatch) => {
+        // put a listener on notifications so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/gameStarted').on('value', (snapshot) => {
+            let updates = { gameStarted: snapshot.val() }
+            dispatch(handleUpdateSyncState(updates))
+        })
     }
 }
 
@@ -246,9 +274,6 @@ function listenToGamestackUpdates(gameID) {
         // as soon as we detect any update
         db.ref('/game/' + gameID + '/gameStack').on('value', (snapshot) => {
             let { syncState } = getState()
-
-            // if no changes, just return
-            if(syncState.gameStack.length === snapshot.val().length) return
 
             if(syncState.gameStarted) {
                 let action = {

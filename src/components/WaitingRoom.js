@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import Game from './Game'
 import { 
-    handlePlayers, handleSelectPlayer, 
+    handleSelectPlayer, 
     handleStartGame, handleSetUpListeners 
 } from '../actions'
 
@@ -159,7 +159,6 @@ class WaitingRoom extends Component {
     }
     componentDidMount() {  
         this.props.dispatch(handleSetUpListeners())
-        this.props.dispatch(handlePlayers()) 
     }
     startGame() {
         this.props.dispatch(handleStartGame())
