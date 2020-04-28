@@ -222,16 +222,19 @@ export function listenToPlayersUpdates(gameID) {
                 players
             })
 
-            let personalStack = [] 
+            // if personal stack is already setup, move on
+            if(localState.personalStack.length < 1) {
+                let personalStack = [] 
 
-            players.forEach((p) => {
-                // stack for the current player
-                if(p.playerID === localState.selectedPlayer) {
-                    personalStack = p.personalStack
-                }
-            })
+                players.forEach((p) => {
+                    // stack for the current player
+                    if(p.playerID === localState.selectedPlayer) {
+                        personalStack = p.personalStack ? p.personalStack : []
+                    }
+                })
 
-            dispatch(handleUpdateLocalState({personalStack}))
+                dispatch(handleUpdateLocalState({personalStack}))
+            }
         });
     }
 }
