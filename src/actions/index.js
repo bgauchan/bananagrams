@@ -30,12 +30,16 @@ export function handleSetupGame() {
 
                 let updatedLocalState = { gameID }
                 let localStateCache = JSON.parse(localStorage.getItem("localStateCache"))
-                let cacheHasNotExpired = localStateCache ? localStateCache.expiryTimestamp > Date.now() : false
                 
-                if(cacheHasNotExpired) {
-                    updatedLocalState = {
-                        ...localStateCache,
-                        gameID
+                if(localStateCache) {
+                    let cacheHasNotExpired = localStateCache.expiryTimestamp > Date.now()
+                    let cachedGameID = localStateCache.gameID
+                
+                    if(cacheHasNotExpired && gameID === cachedGameID) {
+                        updatedLocalState = {
+                            ...localStateCache,
+                            gameID
+                        }
                     }
                 }
         
