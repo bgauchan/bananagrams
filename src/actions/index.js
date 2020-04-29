@@ -2,7 +2,7 @@
 import db from '../firebase'
 import { getShuffledTiles } from '../helpers'
 import { handleUpdateSyncState, getPersonalStackAfterDumpOrPeel } from './syncState'
-import { handleUpdateLocalState } from './localState'
+import { handleUpdateLocalState, handleRemoveNewStatus } from './localState'
 
 export const SETUP_GAME = 'SETUP_GAME'
 export const SETUP_GAME_FROM_SERVER = 'SETUP_GAME_FROM_SERVER'
@@ -350,8 +350,12 @@ export function handlePeelTile() {
         
         db.ref('/game/' + gameID + '/gameStack').set(updatedGameStack)
         .then(() => {
+            dispatch(handleSendNotification({
+                type: 'peel',
+                text: `${localState.selectedPlayer} called Peel!`
+            }))
+
             let updatedPersonalStack = getPersonalStackAfterDumpOrPeel(localState.personalStack, 1)
-            // let updatedPersonalStack = [...localState.personalStack, ...newTile]
 
             let updatedLocalState = {
                 ...localState,
@@ -359,6 +363,11 @@ export function handlePeelTile() {
             }
 
             dispatch(handleUpdateLocalState(updatedLocalState))
+
+            // remove new status from tiles in personal stack after 5s
+            setTimeout(() => {
+                dispatch(handleRemoveNewStatus())
+            }, 5000);
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))  
     }
