@@ -29,7 +29,8 @@ export function handleSetupGame() {
                 }
 
                 let updatedLocalState = { gameID }
-                let localStateCache = JSON.parse(localStorage.getItem("localStateCache"))
+                let localStateCache = localStorage.getItem("localStateCache")
+                localStateCache = localStateCache ? JSON.parse(localStateCache) : {}
                 
                 if(localStateCache) {
                     let cacheHasNotExpired = localStateCache.expiryTimestamp > Date.now()
@@ -150,6 +151,12 @@ export function handleStartGame() {
 
         players.forEach((p) => {
             let personalStack = gameStack.splice(0, numOfPersonalTiles)
+
+            // Since these personal stack tiles are coming from gamestack, the order of
+            // each tile is going to be based on gamestack (so like it could be 22, 45, etc.).
+            // Therefore, we need to reset each tile in the extracted personal stack to be
+            // from 0-21 so it won't cause bugs later on
+            personalStack.forEach((tile, index) => tile.order = index)
             
             // stack for the current player
             if(p.playerID === localState.selectedPlayer) {
