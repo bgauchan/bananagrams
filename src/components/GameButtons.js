@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
+import { handleUpdatePlayStatus } from '../actions'
 
 const StyledButtonsArea = styled.section`
     background: white;
@@ -75,6 +77,15 @@ const StyledButtonsArea = styled.section`
 ` 
 
 class GameButtons extends Component {    
+    peel() {
+        let status = {
+            timestamp: Date.now(),
+            status: 'peel',
+            data: `${this.props.localState.selectedPlayer} called Peeeeel!`
+        }
+
+        this.props.dispatch(handleUpdatePlayStatus(status))
+    }
     render() {
         // hide peel button and show plantaingrams button if the user's
         // personal stack is empty
@@ -90,7 +101,7 @@ class GameButtons extends Component {
                 </h4>
 
                 <div className="buttons">
-                    <button className="peel_btn" disabled={!enableButtons}>
+                    <button className="peel_btn" disabled={!enableButtons} onClick={() => this.peel()}>
                         <img alt="peel" src="https://image.flaticon.com/icons/svg/1012/1012787.svg" />
                         <span>Peel</span>
                     </button>
@@ -105,4 +116,11 @@ class GameButtons extends Component {
     }
 }
 
-export default GameButtons
+const mapStateToProps = (state, ownProps) => ({
+	syncState: state.syncState,
+	localState: state.localState
+})
+
+export default connect(
+	mapStateToProps,
+)(GameButtons)

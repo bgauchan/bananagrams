@@ -1,7 +1,7 @@
 
 import db from '../firebase'
 import { getShuffledTiles } from '../helpers'
-import { handleUpdateSyncState } from './syncState'
+import { handleUpdateSyncState, getPersonalStackAfterDumpOrPeel } from './syncState'
 import { handleUpdateLocalState } from './localState'
 
 export const SETUP_GAME = 'SETUP_GAME'
@@ -136,7 +136,8 @@ export function handleStartGame() {
         let gameStack = [...syncState.gameStack]
         let players = [...syncState.players]
 
-        let numOfPersonalTiles = 21
+        // let numOfPersonalTiles = 21 
+        let numOfPersonalTiles = 3
 	
 		if(players.length > 6) {
 			numOfPersonalTiles = 11
@@ -207,10 +208,36 @@ export function handleSetUpListeners() {
         let { localState } = getState()
         let gameID = localState.gameID
 
+        dispatch(listenToPlayStatus(gameID))
         dispatch(listenToPlayersUpdates(gameID))
         dispatch(listenToGameStarted(gameID))
         dispatch(listenToNotifications(gameID))
         dispatch(listenToGamestackUpdates(gameID))
+    }
+}
+
+export function listenToPlayStatus(gameID) { 
+    return (dispatch, getState) => {
+        let onLoad = true
+
+        // put a listener on settings ref so we can dispatch updates
+        // as soon as we detect any update
+        db.ref('/game/' + gameID + '/playStatus').on('value', function(snapshot) {
+            let { syncState } = getState()            
+            let updates = snapshot.val()
+
+            if(syncState.gameStarted && !onLoad) {
+                switch(updates.status) {
+                    case 'peel':
+                        dispatch(handlePeelTile())
+                        break
+                    default:
+                        break
+                }
+            }
+
+            onLoad = false
+        })
     }
 }
 
@@ -292,6 +319,19 @@ function listenToGamestackUpdates(gameID) {
     }
 }
 
+//------------------ Update play status ------------------//
+
+export const UPDATE_PLAY_STATUS = 'UPDATE_PLAY_STATUS'
+
+export function handleUpdatePlayStatus(status) {
+    return (dispatch, getState) => {        
+        let { localState } = getState()
+
+        db.ref('/game/' + localState.gameID + '/playStatus').set(status)
+        .catch((error) => console.error("Firebase: error adding document: ", error))  
+    }
+}
+
 //------------------ Peel tile ------------------//
 
 export const PEEL_TILE = 'PEEL_TILE'
@@ -302,17 +342,23 @@ export function handlePeelTile() {
         let gameID = localState.gameID
         let numOfPlayers = syncState.players.length
 
-        // update db
-        db.ref('/game/' + gameID + '/gamestack').transaction((prevGameStack) => {
-            // give each player a tile, which means we should remove
-            // tiles equal to the number of players
-            prevGameStack.splice(0, numOfPlayers)
-            return prevGameStack
-        })
+        let updatedGameStack = syncState.gameStack
+
+        // give each player a tile, which means we should remove
+        // tiles equal to the number of players
+        updatedGameStack.splice(0, numOfPlayers)
+        
+        db.ref('/game/' + gameID + '/gameStack').set(updatedGameStack)
         .then(() => {
-            dispatch({
-                type: PEEL_TILE,
-            })
+            let updatedPersonalStack = getPersonalStackAfterDumpOrPeel(localState.personalStack, 1)
+            // let updatedPersonalStack = [...localState.personalStack, ...newTile]
+
+            let updatedLocalState = {
+                ...localState,
+                personalStack: updatedPersonalStack
+            }
+
+            dispatch(handleUpdateLocalState(updatedLocalState))
         })
         .catch((error) => console.error("Firebase: error adding document: ", error))  
     }

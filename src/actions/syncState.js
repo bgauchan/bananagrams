@@ -44,13 +44,13 @@ export function handleUpdateSyncState(updates) {
     }
 }
 
-function getPersonalStackAfterDump(personalStack) {		
-    let extraThreeTiles = getShuffledTiles(3)
+export function getPersonalStackAfterDumpOrPeel(personalStack, count) {		
+    let extraTiles = getShuffledTiles(count)
     
     let updatedStack = personalStack.map((tile, index) => {
         // if there are empty slots, fill those up first
-        if((tile === null || tile === undefined) && extraThreeTiles.length > 0) {
-            let newTile = extraThreeTiles.shift() // take one of the extra tiles
+        if((tile === null || tile === undefined) && extraTiles.length > 0) {
+            let newTile = extraTiles.shift() // take one of the extra tiles
             newTile.order = index
             newTile.isNew = true
             return newTile
@@ -62,7 +62,7 @@ function getPersonalStackAfterDump(personalStack) {
     let nextOrder = updatedStack.length
     
     // if all the 3 extra tiles haven't been swapped in, add them to the end
-    extraThreeTiles.forEach(tile => {
+    extraTiles.forEach(tile => {
         tile.order = nextOrder
         tile.isNew = true
         nextOrder++
@@ -86,7 +86,7 @@ export function handleDumpTile(updates) {
         // if its a tile being dumped, take 3 tiles from game stack
         // and put it in personal stack AND take the dumped tile, and
         // put it in the game stack		
-        let updatedPersonalStack = getPersonalStackAfterDump(localState.personalStack)
+        let updatedPersonalStack = getPersonalStackAfterDumpOrPeel(localState.personalStack, 3)
 
         let localStateUpdates = { 
             ...updates.localState,

@@ -54,10 +54,10 @@ class App extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-	let notifications = state.syncState.notifications
-
+	let notifications = state.syncState.notifications ? state.syncState.notifications : []
+	
 	// only show notifications that are not older than 30 seconds
-	let notificationsToShow =  notifications ? notifications.filter((n) => (Date.now() - n.date) < 30000) : []
+	let notificationsToShow =  notifications.filter((n) => (Date.now() - n.date) < 30000)
 
 	return {
 		notifications: notificationsToShow,
