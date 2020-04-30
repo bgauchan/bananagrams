@@ -225,11 +225,14 @@ export function listenToPlayStatus(gameID) {
         db.ref('/game/' + gameID + '/playStatus').on('value', function(snapshot) {
             let { syncState } = getState()            
             let updates = snapshot.val()
-
+            
             if(syncState.gameStarted && !onLoad) {
                 switch(updates.status) {
                     case 'peel':
                         dispatch(handlePeelTile())
+                        break
+                    case 'bananagrams':
+                        dispatch(handleGameOver(updates.data))
                         break
                     default:
                         break
@@ -319,6 +322,18 @@ function listenToGamestackUpdates(gameID) {
     }
 }
 
+//------------------ Game Over ------------------//
+
+export function handleGameOver(winningStack) {
+    return (dispatch, getState) => {        
+        let { localState } = getState()
+        
+        db.ref('/game/' + localState.gameID + '/winningStack').set(winningStack)
+        .then(() => dispatch(handleUpdateSyncState({ winningStack })))
+        .catch((error) => console.error("Firebase: error adding document: ", error))  
+    }
+}
+
 //------------------ Update play status ------------------//
 
 export const UPDATE_PLAY_STATUS = 'UPDATE_PLAY_STATUS'
@@ -326,7 +341,7 @@ export const UPDATE_PLAY_STATUS = 'UPDATE_PLAY_STATUS'
 export function handleUpdatePlayStatus(status) {
     return (dispatch, getState) => {        
         let { localState } = getState()
-
+        
         db.ref('/game/' + localState.gameID + '/playStatus').set(status)
         .catch((error) => console.error("Firebase: error adding document: ", error))  
     }

@@ -77,14 +77,20 @@ const StyledButtonsArea = styled.section`
 ` 
 
 class GameButtons extends Component {    
-    peel() {
-        let status = {
-            timestamp: Date.now(),
-            status: 'peel',
-            data: `${this.props.localState.selectedPlayer} called Peeeeel!`
+    updatePlayStatus(status) {
+        let data = `${this.props.localState.selectedPlayer} called ${status}!`
+
+        if(status === 'bananagrams') {
+            data = this.props.localState.solvedStack.filter((tile) => tile !== undefined && tile !== null)
         }
 
-        this.props.dispatch(handleUpdatePlayStatus(status))
+        let statusObj = {
+            timestamp: Date.now(),
+            status,
+            data
+        }
+
+        this.props.dispatch(handleUpdatePlayStatus(statusObj))
     }
     render() {
         // hide peel button and show plantaingrams button if the user's
@@ -101,11 +107,11 @@ class GameButtons extends Component {
                 </h4>
 
                 <div className="buttons">
-                    <button className="peel_btn" disabled={!enableButtons} onClick={() => this.peel()}>
+                    <button className="peel_btn" disabled={!enableButtons} onClick={() => this.updatePlayStatus('peel')}>
                         <img alt="peel" src="https://image.flaticon.com/icons/svg/1012/1012787.svg" />
                         <span>Peel</span>
                     </button>
-                    <button className="bananagrams_btn" disabled={!enableButtons}>
+                    <button className="bananagrams_btn" disabled={!enableButtons} onClick={() => this.updatePlayStatus('bananagrams')}>
                         <img alt="peel" className="winner"
                             src="https://image.flaticon.com/icons/svg/2293/2293014.svg" />
                         <span>Bananagrams!!</span>

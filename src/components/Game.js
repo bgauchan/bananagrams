@@ -142,6 +142,34 @@ const StyledGameBoard = styled(StyledBoard)`
 		color: #e6b242;
 	}
 `
+const StyledGWinnersameBoard = styled(StyledBoard)`
+	background: #fbf6ef;
+	justify-content: left;
+	min-width: 1750px;
+
+	li {
+        border: 1px dotted lightgrey;
+        height: 80px;
+        width: 80px;
+
+		&.is_new {
+			border: 1px dotted lightgrey;
+
+			span {
+				color: #e6b242;
+			}
+		}
+		
+		&.is_new:after {
+			content: '';
+			padding: 0;
+		}
+	}
+
+	span {
+		color: #e6b242;
+	}
+`
 
 class Game extends Component {
     componentDidMount() {
@@ -195,35 +223,47 @@ class Game extends Component {
 	}
     render() {
 		let { syncState, localState } = this.props
+		let winningStack = [...Array(440)]
+
+		if(syncState.winningStack) {			
+			syncState.winningStack.map((tile) => winningStack[tile.order] = tile)
+		}
 
         return (
-            <StyledApp>
-				<StyledSidebar>
-					<div className="logo">
-						<img alt='logo' src='https://image.flaticon.com/icons/svg/575/575393.svg' />
-						<h1>Bananagrams</h1>
-					</div>
-					<StyledBoard>
-						{ localState.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
-					</StyledBoard>
-					<div className="dump_zone">
-						<span>Dump a Tile here to trade it for 3 tiles</span>
-						<StyledBoard>
-							{ localState.dumpStack.map((piece, i) => this.renderPieceContainer(piece, i, 'dumpStack')) }
-						</StyledBoard>
-					</div>
-				</StyledSidebar>
-				<StyledGameArea>
-					<StyledGameBoard>
-						{ localState.solvedStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
-					</StyledGameBoard>
-				</StyledGameArea>
+			<div>
+				{ syncState.winningStack ? 
+					<StyledGWinnersameBoard>
+						{ winningStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
+					</StyledGWinnersameBoard> : 
+					<StyledApp>
+						<StyledSidebar>
+							<div className="logo">
+								<img alt='logo' src='https://image.flaticon.com/icons/svg/575/575393.svg' />
+								<h1>Bananagrams</h1>
+							</div>
+							<StyledBoard>
+								{ localState.personalStack.map((piece, i) => this.renderPieceContainer(piece, i, 'personalStack')) }
+							</StyledBoard>
+							<div className="dump_zone">
+								<span>Dump a Tile here to trade it for 3 tiles</span>
+								<StyledBoard>
+									{ localState.dumpStack.map((piece, i) => this.renderPieceContainer(piece, i, 'dumpStack')) }
+								</StyledBoard>
+							</div>
+						</StyledSidebar>
+						<StyledGameArea>
+							<StyledGameBoard>
+								{ localState.solvedStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
+							</StyledGameBoard>
+						</StyledGameArea>
 
-				<GameButtons 
-					personalStack={localState.personalStack} 
-					gameStack={syncState.gameStack} 
-				/>
-            </StyledApp>
+						<GameButtons 
+							personalStack={localState.personalStack} 
+							gameStack={syncState.gameStack} 
+						/>
+					</StyledApp>
+				}
+			</div>
         )
     }
 }
