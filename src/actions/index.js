@@ -232,7 +232,7 @@ export function listenToPlayStatus(gameID) {
                         dispatch(handlePeelTile())
                         break
                     case 'bananagrams':
-                        dispatch(handleGameOver(updates.data))
+                        dispatch(handleGameOver(updates))
                         break
                     default:
                         break
@@ -324,12 +324,15 @@ function listenToGamestackUpdates(gameID) {
 
 //------------------ Game Over ------------------//
 
-export function handleGameOver(winningStack) {
+export function handleGameOver(updates) {
     return (dispatch, getState) => {        
         let { localState } = getState()
         
-        db.ref('/game/' + localState.gameID + '/winningStack').set(winningStack)
-        .then(() => dispatch(handleUpdateSyncState({ winningStack })))
+        db.ref('/game/' + localState.gameID + '/winningStack').set(updates.data)
+        .then(() => dispatch(handleUpdateSyncState({ 
+            winningStack: updates.data,
+            winningPlayer: updates.player
+        })))
         .catch((error) => console.error("Firebase: error adding document: ", error))  
     }
 }

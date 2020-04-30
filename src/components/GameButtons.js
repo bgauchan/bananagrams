@@ -87,7 +87,8 @@ class GameButtons extends Component {
         let statusObj = {
             timestamp: Date.now(),
             status,
-            data
+            data,
+            player: this.props.localState.selectedPlayer
         }
 
         this.props.dispatch(handleUpdatePlayStatus(statusObj))

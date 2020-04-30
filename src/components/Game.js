@@ -10,6 +10,31 @@ const StyledApp = styled.div`
 	background: #fbf6ef;
 	display: flex;
 	width: 100vw;
+
+	.winning_notice {
+		position: fixed;
+		top: 10px;
+		background: #03A9F4;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 1;
+		margin: 0;
+		color: white;
+		padding: 5px 20px;
+		border-radius: 10px;
+		border: 1px solid #0797d8;
+		font-size: 16px;
+		text-align: center;
+		line-height: 26px;
+
+		span {
+			text-transform: capitalize;
+		}
+
+		label {
+			display: block;
+		}
+	}
 `
 
 const StyledSidebar = styled.aside`
@@ -173,6 +198,9 @@ const StyledGWinnersameBoard = styled(StyledBoard)`
 
 class Game extends Component {
     componentDidMount() {
+		this.centerAlign()
+	}
+	centerAlign() {
         // use the center tile to center the dropzone area
 		let centerTile = document.querySelector('.center_tile');
 		
@@ -224,17 +252,33 @@ class Game extends Component {
     render() {
 		let { syncState, localState } = this.props
 		let winningStack = [...Array(440)]
+		let winningPlayer = ''
 
-		if(syncState.winningStack) {			
+		if(syncState.winningStack) {
+			if(syncState.winningPlayer) {
+				winningPlayer = syncState.winningPlayer
+			} else {
+				winningPlayer = syncState.playStatus.player
+			}
+
+			winningPlayer = winningPlayer.split('_').join(' ')
+
 			syncState.winningStack.map((tile) => winningStack[tile.order] = tile)
+			this.centerAlign()
 		}
 
         return (
 			<div>
 				{ syncState.winningStack ? 
-					<StyledGWinnersameBoard>
-						{ winningStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
-					</StyledGWinnersameBoard> : 
+					<StyledApp>
+						<h1 className="winning_notice">
+							<span>{ winningPlayer }</span> called out Bananagrams.
+							<label>Here's the board to verify.</label>
+						</h1>
+						<StyledGWinnersameBoard>
+							{ winningStack.map((piece, i) => this.renderPieceContainer(piece, i, 'solvedStack')) }
+						</StyledGWinnersameBoard> 
+					</StyledApp> : 
 					<StyledApp>
 						<StyledSidebar>
 							<div className="logo">
