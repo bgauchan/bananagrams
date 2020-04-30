@@ -18,7 +18,7 @@ const StyledSection = styled.section`
 
     .bananagram span {
         background: #fbf6ef;
-        box-shadow: 0 0 0 1px #f1d63b inset, 0 0 0 2px rgba(255,255,255,0.10) inset, 0 6px 0 0 #c7ba40, 0 8px 8px 1px rgba(0,0,0,.2);
+        border: 1px solid #e6b242;
         border-radius: 8px;
         color: #e6b242;
         display: flex;
@@ -26,8 +26,8 @@ const StyledSection = styled.section`
         justify-content: center;
         font-size: 24px;
         font-weight: bold;
-        height: 60px;
-        width: 60px;
+        height: 70px;
+        width: 70px;
         margin: 0 3px;
     }
 
