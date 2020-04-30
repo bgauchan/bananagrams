@@ -1,5 +1,5 @@
 import db from '../firebase'
-import { handleSendNotification } from './index'
+// import { handleSendNotification } from './index'
 import { handleUpdateLocalState, handleRemoveNewStatus } from './localState'
 import { getShuffledTiles } from '../helpers'
 
@@ -107,10 +107,10 @@ export function handleDumpTile(updates) {
             return prevGameStack
         })
         .then(() => {
-            dispatch(handleSendNotification({
-                type: 'dump',
-                text: `${localState.selectedPlayer} dumped a tile!`
-            }))
+            // dispatch(handleSendNotification({
+            //     type: 'dump',
+            //     text: `${localState.selectedPlayer} dumped a tile!`
+            // }))
 
             dispatch(dumpTile(updates.tile))
             dispatch(handleUpdateLocalState(localStateUpdates))

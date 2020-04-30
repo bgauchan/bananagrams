@@ -7,7 +7,7 @@ import {
     ERROR_NO_GAME, CREATE_GAME, 
     UPDATE_SELECTED_PLAYERS, START_GAME,
     UPDATE_GAMESTACK,
-    SEND_NOTIFICATION, REMOVE_NOTIFICATION
+    // SEND_NOTIFICATION, REMOVE_NOTIFICATION
 } from '../actions'
 
 const syncState = (state = {}, action)  => {    
@@ -38,16 +38,16 @@ const syncState = (state = {}, action)  => {
                 ...state,
                 players: action.players
             }
-        case SEND_NOTIFICATION:
-            return {
-                ...state,
-                notifications: state.notifications ? [...state.notifications, action.notification] : [action.notification]
-            } 
-        case REMOVE_NOTIFICATION:
-            return {
-                ...state,
-                notifications: action.notifications
-            }
+        // case SEND_NOTIFICATION:
+        //     return {
+        //         ...state,
+        //         notifications: state.notifications ? [...state.notifications, action.notification] : [action.notification]
+        //     } 
+        // case REMOVE_NOTIFICATION:
+        //     return {
+        //         ...state,
+        //         notifications: action.notifications
+        //     }
         default:
            return state
     }
