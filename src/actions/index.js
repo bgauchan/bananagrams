@@ -136,8 +136,7 @@ export function handleStartGame() {
         let gameStack = [...syncState.gameStack]
         let players = [...syncState.players]
 
-        // let numOfPersonalTiles = 21 
-        let numOfPersonalTiles = 3
+        let numOfPersonalTiles = 21 
 	
 		if(players.length > 6) {
 			numOfPersonalTiles = 11
